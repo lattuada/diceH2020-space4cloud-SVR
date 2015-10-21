@@ -7,7 +7,6 @@
 ## All the combinations of values in @var{C} and @var{epsilon} are considered.
 ## Return the handle @var{h} to the plot.
 ##
-## @seealso{}
 ## @end deftypefn
 
 function h = plot_MSE (ytrain, Xtrain, ytest, Xtest, C, epsilon, options)

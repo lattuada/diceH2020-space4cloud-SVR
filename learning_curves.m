@@ -8,7 +8,6 @@
 ## cross validation set @var{ycv}, @var{Xcv}.
 ## Return the handle @var{h} to the plot.
 ##
-## @seealso{}
 ## @end deftypefn
 
 function h = learning_curves (ytrain, Xtrain, ytest, Xtest, ycv, Xcv, options)
