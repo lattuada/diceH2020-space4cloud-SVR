@@ -2,7 +2,7 @@ clear all
 close all hidden
 clc
 
-[values, sample] = read_data ("dati.csv");
+[values, sample] = read_from_directory ("/home/eugenio/Desktop/csv");
 
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
