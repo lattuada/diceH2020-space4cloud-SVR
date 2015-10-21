@@ -4,6 +4,7 @@
 ## Read data from the input CSV file named @var{filename} and return its
 ## first column as @var{y} and the remaining ones as matrix @var{X}.
 ##
+## @seealso{read_from_directory}
 ## @end deftypefn
 
 function [y, X] = read_data (filename)
