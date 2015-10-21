@@ -8,14 +8,7 @@ sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
 [X, ~, dev] = scale (sample);
-idx = find (dev != 0);
-X = X(:, idx);
-dev = dev(idx);
-
 [X_nCores, ~, dev_nCores] = scale (sample);
-idx = find (dev_nCores != 0);
-X_nCores = X_nCores(:, idx);
-dev_nCores = dev_nCores(idx);
 
 [ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X_nCores, 0.6, 0.2);
 [ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
@@ -115,4 +108,7 @@ model = svmtrain (ytr, Xtr, options);
 [~, accuracy, ~] = svmpredict (ycv, Xcv, model);
 MSEs(4) = accuracy(2);
 
+rel_MSEs = MSEs / max (MSEs);
+
 MSEs
+rel_MSEs
