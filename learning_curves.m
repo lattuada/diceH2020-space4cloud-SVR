@@ -16,13 +16,15 @@ raw_options = options;
 alphas = 0.05:0.05:1;
 MSE_train = zeros (size (alphas));
 MSE_cv = zeros (size (alphas));
-m = length (ytrain);
+m_train = length (ytrain);
+m_test = length (ytest);
 
 for (ii = 1:length (alphas))
   alpha = alphas(ii);
-  m_part = round (alpha * m);
+  m_part = round (alpha * m_train);
   ytr = ytrain(1:m_part);
   Xtr = Xtrain(1:m_part, :);
+  m_part = round (alpha * m_test);
   ytst = ytest(1:m_part);
   Xtst = Xtest(1:m_part, :);
   
