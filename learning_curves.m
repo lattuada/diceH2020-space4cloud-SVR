@@ -20,10 +20,11 @@ m = length (ytrain);
 
 for (ii = 1:length (alphas))
   alpha = alphas(ii);
-  ytr = ytrain(1:alpha*m);
-  Xtr = Xtrain(1:alpha*m);
-  ytst = ytest(1:alpha*m);
-  Xtst = Xtest(1:alpha*m);
+  m_part = round (alpha * m);
+  ytr = ytrain(1:m_part);
+  Xtr = Xtrain(1:m_part, :);
+  ytst = ytest(1:m_part);
+  Xtst = Xtest(1:m_part, :);
   
   C = Inf;
   eps = Inf;
