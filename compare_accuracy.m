@@ -7,10 +7,10 @@ clc
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
-[X, ~, dev] = scale (sample);
-[X_nCores, ~, dev_nCores] = scale (sample);
+[X, ~, ~] = scale (sample);
+[X_nCores, ~, ~] = scale (sample);
 
-[ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X_nCores, 0.6, 0.2);
+[ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X, 0.6, 0.2);
 [ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
   split_sample (values, X_nCores, 0.6, 0.2);
 
