@@ -1,5 +1,5 @@
 ## -*- texinfo -*- 
-## @deftypefn {Function File} {@var{h} =} plot_RMSE (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{C}, @var{epsilon}, @var{options})
+## @deftypefn {Function File} {@var{h} =} plot_RMSE (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C}, @var{epsilon})
 ##
 ## Train an SVR model specified by @var{options} on the training set
 ## @var{ytrain}, @var{Xtrain} and plot the root mean squared error obtained on the
@@ -9,7 +9,7 @@
 ##
 ## @end deftypefn
 
-function h = plot_RMSE (ytrain, Xtrain, ytest, Xtest, C, epsilon, options)
+function h = plot_RMSE (ytrain, Xtrain, ytest, Xtest, options, C, epsilon)
 
 [cc, ee] = meshgrid (C, epsilon);
 RMSE = zeros (size (cc));
