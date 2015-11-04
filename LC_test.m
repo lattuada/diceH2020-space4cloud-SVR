@@ -6,4 +6,4 @@ clc
 [X, ~, ~] = scale (sample);
 [ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X, 0.6, 0.2);
 
-learning_curves (ytr, Xtr, ytst, Xtst, ycv, Xcv, "-s 3 -t 0 -q");
+learning_curves (ytr, Xtr, ycv, Xcv, "-s 3 -t 0 -q -p 0.1 -c 1", 0.2);
