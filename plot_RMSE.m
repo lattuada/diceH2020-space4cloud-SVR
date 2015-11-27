@@ -22,10 +22,12 @@ for (ii = 1:length (cc))
   RMSE(ii) = sqrt (accuracy(2));
 endfor
 
-h = surf (cc, ee, RMSE);
+rel_RMSE = RMSE / mean ([ytrain; ytest]);
+
+h = surf (cc, ee, rel_RMSE);
 xlabel ('C');
 ylabel ('\epsilon');
-zlabel ('MSE');
-title ('MSE at varying model parameters');
+zlabel ('Relative RMSE');
+title ('Relative RMSE at varying model parameters');
 
 endfunction

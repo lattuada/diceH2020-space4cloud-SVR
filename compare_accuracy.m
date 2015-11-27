@@ -45,7 +45,9 @@ model = svmtrain (ytr, Xtr, options);
 [~, accuracy, ~] = svmpredict (ycv, Xcv, model);
 RMSEs(4) = sqrt (accuracy(2));
 
-rel_RMSEs = RMSEs / max (RMSEs);
+percent_RMSEs = RMSEs / max (RMSEs);
+rel_RMSEs = RMSEs / mean (values);
 
 RMSEs
+percent_RMSEs
 rel_RMSEs
