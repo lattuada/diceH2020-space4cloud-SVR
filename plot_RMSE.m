@@ -16,7 +16,7 @@ RMSE = zeros (size (cc));
 raw_options = options;
 
 for (ii = 1:length (cc))
-  options = [raw_options, " -c ", num2str(cc(ii)), " -p ", num2str(ee(ii))];
+  options = [raw_options, " -q -c ", num2str(cc(ii)), " -p ", num2str(ee(ii))];
   model = svmtrain (ytrain, Xtrain, options);
   [~, accuracy, ~] = svmpredict (ytest, Xtest, model, "-q");
   RMSE(ii) = sqrt (accuracy(2));
