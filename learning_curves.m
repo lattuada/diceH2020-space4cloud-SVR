@@ -18,11 +18,13 @@ endif
 alphas = alpha0:0.01:1;
 MSE_train = zeros (size (alphas));
 MSE_cv = zeros (size (alphas));
+steps = zeros (size (alphas));
 m = length (ytrain);
 
 for (ii = 1:length (alphas))
   alpha = alphas(ii);
   m_part = round (alpha * m);
+  steps(ii) = m_part;
   ytr = ytrain(1:m_part);
   Xtr = Xtrain(1:m_part, :);
   model = svmtrain (ytr, Xtr, options);
@@ -33,11 +35,11 @@ for (ii = 1:length (alphas))
 endfor
 
 h = figure;
-plot (alphas, MSE_train, "b-", "linewidth", 2);
+plot (steps, MSE_train, "b-", "linewidth", 2);
 hold on;
-plot (alphas, MSE_cv, "r-", "linewidth", 2);
+plot (steps, MSE_cv, "r-", "linewidth", 2);
 legend ("Training set", "Cross validation set");
-xlabel ('\alpha');
+xlabel ('m');
 ylabel ('MSE');
 title ('Learning curve at varying training set size');
 grid on;
