@@ -14,11 +14,15 @@ sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 [ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
   split_sample (values, X_nCores, 0.6, 0.2);
 
+small_dimensional = true;
+C_range = [0.1 0.5];
+E_range = [0.1 0.5];
+
 RMSEs = zeros (4, 1);
 Cs = zeros (4, 1);
 Es = zeros (4, 1);
-C_range = [0.1 0.5];
-E_range = [0.1 0.5];
+w = cell (2, 1);
+b = cell (2, 1);
 
 %% White box model, nCores
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 0 -q -h 0", C_range, E_range);
@@ -28,6 +32,8 @@ model = svmtrain (ytr, Xtr, options);
 Cs(1) = C;
 Es(1) = eps;
 RMSEs(1) = sqrt (accuracy(2));
+w{1} = model.SVs' * model.sv_coef;
+b{1} = - model.rho;
 
 %% White box model, nCores^(-1)
 [C, eps] = model_selection (ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, "-s 3 -t 0 -q -h 0", C_range, E_range);
@@ -37,6 +43,8 @@ model = svmtrain (ytr_nCores, Xtr_nCores, options);
 Cs(2) = C;
 Es(2) = eps;
 RMSEs(2) = sqrt (accuracy(2));
+w{2} = model.SVs' * model.sv_coef;
+b{2} = - model.rho;
 
 %% Black box model, Polynomial
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 1 -q -h 0", C_range, E_range);
@@ -62,3 +70,19 @@ rel_RMSEs = RMSEs / median (values);
 RMSEs
 percent_RMSEs
 rel_RMSEs
+
+if (small_dimensional)
+  figure;
+  h = plot (X, values, "g+");
+  hold on;
+  func = @(x) w{1}' * x + b{1};
+  ezplot (func, get (h, "xlim"));
+  title ("Linear kernels");
+
+  figure;
+  h = plot (X, values, "g+");
+  hold on;
+  func = @(x) w{2}' * x + b{2};
+  ezplot (func, get (h, "xlim"));
+  title ("Polynomial kernels");
+endif
