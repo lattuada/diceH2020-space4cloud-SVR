@@ -16,8 +16,8 @@ if (alpha0 > 1 || alpha0 < 0)
 endif
 
 alphas = alpha0:0.01:1;
-RMSE_train = zeros (size (alphas));
-RMSE_cv = zeros (size (alphas));
+MSE_train = zeros (size (alphas));
+MSE_cv = zeros (size (alphas));
 m = length (ytrain);
 
 for (ii = 1:length (alphas))
@@ -27,18 +27,18 @@ for (ii = 1:length (alphas))
   Xtr = Xtrain(1:m_part, :);
   model = svmtrain (ytr, Xtr, options);
   [~, accuracy, ~] = svmpredict (ytr, Xtr, model, "-q");
-  RMSE_train(ii) = sqrt (accuracy(2));
+  MSE_train(ii) = accuracy(2);
   [~, accuracy, ~] = svmpredict (ycv, Xcv, model, "-q");
-  RMSE_cv(ii) = sqrt (accuracy(2));
+  MSE_cv(ii) = accuracy(2);
 endfor
 
 h = figure;
-plot (alphas, RMSE_train, "b-", "linewidth", 2);
+plot (alphas, MSE_train, "b-", "linewidth", 2);
 hold on;
-plot (alphas, RMSE_cv, "r-", "linewidth", 2);
+plot (alphas, MSE_cv, "r-", "linewidth", 2);
 legend ("Training set", "Cross validation set");
 xlabel ('\alpha');
-ylabel ('RMSE');
+ylabel ('MSE');
 title ('Learning curve at varying training set size');
 grid on;
 hold off;
