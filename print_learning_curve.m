@@ -10,8 +10,9 @@ cv_frac = 1 - train_frac - test_frac;
 [X, ~, ~] = scale (sample);
 [ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X, train_frac, test_frac);
 
-range = [0.1 0.3 0.5 1];
+C_range = [0.1 0.3 0.5 1];
+E_range = [0.1 0.3 0.5 1];
 initial_options = "-s 3 -t 0 -q";
-[C, eps] = model_selection (ytr, Xtr, ytst, Xtst, initial_options, range, range);
+[C, eps] = model_selection (ytr, Xtr, ytst, Xtst, initial_options, C_range, E_range);
 options = [initial_options, " -p ", num2str(eps), " -c ", num2str(C)];
 learning_curves (ytr, Xtr, ycv, Xcv, options, cv_frac);
