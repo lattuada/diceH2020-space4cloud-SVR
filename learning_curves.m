@@ -1,30 +1,26 @@
 ## -*- texinfo -*- 
-## @deftypefn {Function File} {@var{h} =} learning_curves (@var{ytrain}, @var{Xtrain}, @var{ycv}, @var{Xcv}, @var{options}, @var{alpha0})
+## @deftypefn {Function File} {@var{h} =} learning_curves (@var{ytrain}, @var{Xtrain}, @var{ycv}, @var{Xcv}, @var{options})
 ##
 ## Train an SVR model specified by @var{options} on the training set
-## @var{ytrain}, @var{Xtrain} at varying dataset size, starting from
-## a fraction @var{alpha0}, and plot the learning curves considering the
+## @var{ytrain}, @var{Xtrain} at varying dataset size
+## and plot the learning curves considering the
 ## cross validation set @var{ycv}, @var{Xcv}.
 ## Return the handle @var{h} to the plot.
 ##
 ## @end deftypefn
 
-function h = learning_curves (ytrain, Xtrain, ycv, Xcv, options, alpha0)
+function h = learning_curves (ytrain, Xtrain, ycv, Xcv, options)
 
-if (alpha0 > 1 || alpha0 < 0)
-  error ("learning_curves: ALPHA0 should be between 0 and 1");
-endif
+m_train = length (ytrain);
+m_cv = length (ycv);
 
-alphas = alpha0:0.01:1;
-MSE_train = zeros (size (alphas));
-MSE_cv = zeros (size (alphas));
-steps = zeros (size (alphas));
-m = length (ytrain);
+m = round (linspace (m_cv, m_train, 20));
+MSE_train = zeros (size (m));
+MSE_cv = zeros (size (m));
+steps = zeros (size (m));
 
-for (ii = 1:length (alphas))
-  alpha = alphas(ii);
-  m_part = round (alpha * m);
-  steps(ii) = m_part;
+for (ii = 1:length (m))
+  m_part = m(ii);
   ytr = ytrain(1:m_part);
   Xtr = Xtrain(1:m_part, :);
   model = svmtrain (ytr, Xtr, options);
@@ -35,9 +31,9 @@ for (ii = 1:length (alphas))
 endfor
 
 h = figure;
-plot (steps, MSE_train, "b-", "linewidth", 2);
+plot (m, MSE_train, "b-", "linewidth", 2);
 hold on;
-plot (steps, MSE_cv, "r-", "linewidth", 2);
+plot (m, MSE_cv, "r-", "linewidth", 2);
 legend ("Training set", "Cross validation set");
 xlabel ('m');
 ylabel ('MSE');
