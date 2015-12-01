@@ -76,7 +76,7 @@ if (small_dimensional)
   h = plot (X, values, "g+");
   hold on;
   func = @(x) w{1}' * x + b{1};
-  ezplot (func);
+  ezplot (func, get (h, "xlim"));
   axis auto;
   title ("Linear kernels");
   grid on;
@@ -85,7 +85,7 @@ if (small_dimensional)
   h = plot (X, values, "g+");
   hold on;
   func = @(x) w{2}' * x + b{2};
-  ezplot (func);
+  ezplot (func, get (h, "xlim"));
   axis auto;
   title ("Polynomial kernels");
   grid on;
