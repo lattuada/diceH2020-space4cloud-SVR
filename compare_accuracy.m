@@ -7,12 +7,20 @@ clc
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
-[X, ~, ~] = scale (sample);
-[X_nCores, ~, ~] = scale (sample);
+[everything, ~, ~] = scale ([values, sample]);
+y = everything(:, 1);
+X = everything(:, 2:end);
 
-[ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (values, X, 0.6, 0.2);
+[everything, ~, ~] = scale ([values, sample_nCores]);
+y_nCores = everything(:, 1);
+X_nCores = everything(:, 2:end);
+
+train_frac = 0.6;
+test_frac = 0.2;
+
+[ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (y, X, train_frac, test_frac);
 [ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
-  split_sample (values, X_nCores, 0.6, 0.2);
+  split_sample (y_nCores, X_nCores, train_frac, test_frac);
 
 small_dimensional = true;
 C_range = [0.1 0.5];
@@ -73,7 +81,7 @@ rel_RMSEs
 
 if (small_dimensional)
   figure;
-  h = plot (X, values, "g+");
+  h = plot (X, y, "g+");
   hold on;
   func = @(x) w{1}' * x + b{1};
   ezplot (func, get (h, "xlim"));
@@ -82,7 +90,7 @@ if (small_dimensional)
   grid on;
 
   figure;
-  h = plot (X, values, "g+");
+  h = plot (X_nCores, y_nCores, "g+");
   hold on;
   func = @(x) w{2}' * x + b{2};
   ezplot (func, get (h, "xlim"));
