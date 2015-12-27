@@ -9,8 +9,8 @@
 
 function [h] = plot_R (y, X)
 
-nCores = X(:, end-1);
-dataSize = X(:, end);
+nCores = X(:, end);
+dataSize = X(:, end-1);
 h = figure;
 plot3 (nCores, dataSize, y, "bx");
 xlabel ('Number of cores');
