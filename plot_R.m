@@ -12,7 +12,8 @@ function [h] = plot_R (y, X)
 nCores = X(:, end);
 dataSize = X(:, end-1);
 h = figure;
-plot3 (nCores, dataSize, y, "bx");
+plot3 (nCores, dataSize, y, "bx", "linewidth", 2);
+grid on;
 xlabel ('Number of cores');
 ylabel ('Dataset size');
 zlabel ('Response time');
