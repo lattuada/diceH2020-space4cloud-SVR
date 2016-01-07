@@ -13,7 +13,7 @@ if (! ischar (directory))
   error ("read_from_directory: DIRECTORY should be a string");
 endif
 
-files = glob ([directory, "/*"]);
+files = glob ([directory, "/*.csv"]);
 
 y = X = [];
 
