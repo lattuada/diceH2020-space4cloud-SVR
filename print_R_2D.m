@@ -36,7 +36,7 @@ for (sz = sizes)
   plot (values, avg, "r:", "linewidth", 2);
   hold off;
 
-  figure_name = [query, "_s", size_string, ".eps"];
+  figure_name = [directory, "/", query, "_s", size_string, ".eps"];
   print ("-depsc2", figure_name);
 
   close all hidden;

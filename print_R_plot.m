@@ -9,5 +9,5 @@ directory = ["/home/gianniti/policloud-runs/", query];
 
 plot_R (values, sample);
 
-figure_name = [query, "_3D.eps"];
+figure_name = [directory, "/", query, "_3D.eps"];
 print ("-depsc2", figure_name);
