@@ -13,6 +13,7 @@ average = mean (sample);
 scaled = bsxfun (@minus, sample, average);
 
 deviation = std (scaled);
-scaled = bsxfun (@rdivide, scaled, deviation);
+divider = deviation + (deviation == 0);
+scaled = bsxfun (@rdivide, scaled, divider);
 
 endfunction
