@@ -10,8 +10,8 @@
 
 function [ytrain, Xtrain, ytest, Xtest, ycv, Xcv] = split_sample (y, X, train, test)
 
-if (train + test >= 1)
-  error ("split_sample: the cross validation set cannot be empty");
+if (train + test > 1)
+  error ("split_sample: wrong fractions");
 endif
 
 m = size (X, 1);
