@@ -14,7 +14,7 @@ dev = std (dirty);
 cols = size (dirty, 2);
 clean = dirty;
 for (jj = 1:cols)
-  idx = (abs (clean(:, jj) - mean(jj)) < 3 * dev(jj));
+  idx = (abs (clean(:, jj) - avg(jj)) < 3 * dev(jj));
   clean = clean(idx, :);
 endfor
 
