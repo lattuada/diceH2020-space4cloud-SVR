@@ -4,16 +4,11 @@
 ## Scale the features in @var{sample} and return the @var{scaled} sample and
 ## the original @var{average} and standard @var{deviation}.
 ##
-## @seealso{unscale}
+## @seealso{unscale, zscore}
 ## @end deftypefn
 
 function [scaled, average, deviation] = scale (sample)
 
-average = mean (sample);
-scaled = bsxfun (@minus, sample, average);
-
-deviation = std (scaled);
-divider = deviation + (deviation == 0);
-scaled = bsxfun (@rdivide, scaled, divider);
+[scaled, average, deviation] = zscore (sample);
 
 endfunction
