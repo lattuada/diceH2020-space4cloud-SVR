@@ -2,8 +2,10 @@ clear all
 close all hidden
 clc
 
-[values, sample] = read_from_directory ("/home/gianniti/cineca-runs/R1/small");
-[big_values, big_sample] = read_from_directory ("/home/gianniti/cineca-runs/R1/big");
+query = "R1";
+base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
+[values, sample] = read_from_directory ([base_dir, query, "/small"]);
+[big_values, big_sample] = read_from_directory ([base_dir, query, "/big"]);
 
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
