@@ -4,6 +4,7 @@ clc
 
 query = "R1";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
+
 [values, sample] = read_from_directory ([base_dir, query, "/small"]);
 [big_values, big_sample] = read_from_directory ([base_dir, query, "/big"]);
 
@@ -41,20 +42,21 @@ ycv_nCores = big_y_nCores;
 Xcv_nCores = big_X_nCores;
 
 small_dimensional = false;
-C_range = linspace (0.1, 5, 20);
-E_range = linspace (0.1, 5, 20);
+C_range = linspace (0.1, 10, 20);
+E_range = linspace (1e-2, 2e-1, 20);
 
-RMSEs = zeros (4, 1);
-Cs = zeros (4, 1);
-Es = zeros (4, 1);
-w = cell (2, 1);
-b = cell (2, 1);
+RMSEs = zeros (1, 4);
+Cs = zeros (1, 4);
+Es = zeros (1, 4);
+predictions = zeros (numel (ycv), 4);
+w = cell (1, 2);
+b = cell (1, 2);
 
 %% White box model, nCores
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 0 -q -h 0", C_range, E_range);
 options = ["-s 3 -t 0 -h 0 -p ", num2str(eps), " -c ", num2str(C)];
 model = svmtrain (ytr, Xtr, options);
-[~, accuracy, ~] = svmpredict (ycv, Xcv, model);
+[predictions(:, 1), accuracy, ~] = svmpredict (ycv, Xcv, model);
 Cs(1) = C;
 Es(1) = eps;
 RMSEs(1) = sqrt (accuracy(2));
@@ -65,7 +67,7 @@ b{1} = - model.rho;
 [C, eps] = model_selection (ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, "-s 3 -t 0 -q -h 0", C_range, E_range);
 options = ["-s 3 -t 0 -h 0 -p ", num2str(eps), " -c ", num2str(C)];
 model = svmtrain (ytr_nCores, Xtr_nCores, options);
-[~, accuracy, ~] = svmpredict (ycv_nCores, Xcv_nCores, model);
+[predictions(:, 2), accuracy, ~] = svmpredict (ycv_nCores, Xcv_nCores, model);
 Cs(2) = C;
 Es(2) = eps;
 RMSEs(2) = sqrt (accuracy(2));
@@ -76,7 +78,7 @@ b{2} = - model.rho;
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 1 -q -h 0", C_range, E_range);
 options = ["-s 3 -t 1 -h 0 -p ", num2str(eps), " -c ", num2str(C)];
 model = svmtrain (ytr, Xtr, options);
-[~, accuracy, ~] = svmpredict (ycv, Xcv, model);
+[predictions(:, 3), accuracy, ~] = svmpredict (ycv, Xcv, model);
 Cs(3) = C;
 Es(3) = eps;
 RMSEs(3) = sqrt (accuracy(2));
@@ -85,17 +87,36 @@ RMSEs(3) = sqrt (accuracy(2));
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 2 -q -h 0", C_range, E_range);
 options = ["-s 3 -t 2 -h 0 -p ", num2str(eps), " -c ", num2str(C)];
 model = svmtrain (ytr, Xtr, options);
-[~, accuracy, ~] = svmpredict (ycv, Xcv, model);
+[predictions(:, 4), accuracy, ~] = svmpredict (ycv, Xcv, model);
 Cs(4) = C;
 Es(4) = eps;
 RMSEs(4) = sqrt (accuracy(2));
 
+robust_avg_value = median ([y; big_y]);
+
 percent_RMSEs = RMSEs / max (RMSEs);
-rel_RMSEs = RMSEs / median (values);
+rel_RMSEs = abs (RMSEs / robust_avg_value);
+
+err = predictions - ycv;
+rel_err = err ./ ycv;
+max_rel_err = max (rel_err);
+min_rel_err = min (rel_err);
+mean_abs_err = mean (abs (err));
+rel_mean_abs_err = abs (mean_abs_err / robust_avg_value);
+
+mean_y = mean (ycv);
+mean_predictions = mean (predictions);
+err_mean = mean_predictions - mean_y;
+rel_err_mean = err_mean / mean_y;
 
 RMSEs
 percent_RMSEs
 rel_RMSEs
+max_rel_err
+min_rel_err
+mean_abs_err
+rel_mean_abs_err
+rel_err_mean
 
 if (small_dimensional)
   figure;
