@@ -6,13 +6,14 @@ clc
 query = "R1_two_cols";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
-dimensions = 2;
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
 %% Real stuff
 [values, sample] = read_from_directory ([base_dir, query, "/small"]);
 [big_values, big_sample] = read_from_directory ([base_dir, query, "/big"]);
+
+dimensions = size (sample, 2);
 
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
@@ -104,19 +105,23 @@ RMSEs(4) = sqrt (accuracy(2));
 robust_avg_value = median (ycv);
 
 percent_RMSEs = 100 * RMSEs / max (RMSEs);
-rel_RMSEs = abs (RMSEs / robust_avg_value);
+rel_RMSEs = RMSEs / abs (robust_avg_value);
 
-err = predictions - ycv;
-rel_err = err ./ ycv;
+abs_err = abs (predictions - ycv);
+rel_err = abs_err ./ abs (ycv);
+
 max_rel_err = max (rel_err);
 min_rel_err = min (rel_err);
-mean_abs_err = mean (abs (err));
-rel_mean_abs_err = abs (mean_abs_err / robust_avg_value);
+mean_rel_err = mean (rel_err);
+
+max_abs_err = max (abs_err);
+mean_abs_err = mean (abs_err);
+min_abs_err = min (abs_err);
 
 mean_y = mean (ycv);
 mean_predictions = mean (predictions);
 err_mean = mean_predictions - mean_y;
-rel_err_mean = err_mean / mean_y;
+rel_err_mean = abs (err_mean / mean_y);
 
 %% Plots
 switch (dimensions)
@@ -124,6 +129,7 @@ switch (dimensions)
     figure;
     plot (X, y, "g+");
     hold on;
+    plot (big_X, big_y, "bd");
     func = @(x) w{1} .* x + b{1};
     extremes = xlim ();
     x = linspace (extremes(1), extremes(2), 10);
@@ -135,6 +141,7 @@ switch (dimensions)
     figure;
     plot (X_nCores, y_nCores, "g+");
     hold on;
+    plot (big_X_nCores, big_y_nCores, "bd");
     func = @(x) w{2} .* x + b{2};
     extremes = xlim ();
     x = linspace (extremes(1), extremes(2), 10);
@@ -146,6 +153,7 @@ switch (dimensions)
     figure;
     plot3 (X(:, 1), X(:, 2), y, "g+");
     hold on;
+    plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
     func = @(x, y) w{1}(1) .* x + w{1}(2) .* y + b{1};
     extremes = xlim ();
     x = linspace (extremes(1), extremes(2), 10);
@@ -162,6 +170,7 @@ switch (dimensions)
     figure;
     plot3 (X_nCores(:, 1), X_nCores(:, 2), y_nCores, "g+");
     hold on;
+    plot3 (big_X_nCores(:, 1), big_X_nCores(:, 2), big_y_nCores, "bd");
     func = @(x, y) w{2}(1) .* x + w{2}(2) .* y + b{2};
     extremes = xlim ();
     x = linspace (extremes(1), extremes(2), 10);
@@ -175,11 +184,20 @@ switch (dimensions)
 endswitch
 
 %% Print metrics
+display ("Root Mean Square Errors");
 RMSEs
 percent_RMSEs
 rel_RMSEs
+
+display ("Relative errors (absolute values)");
 max_rel_err
+mean_rel_err
 min_rel_err
+
+display ("Absolute errors (absolute values)");
+max_abs_err
 mean_abs_err
-rel_mean_abs_err
+min_abs_err
+
+display ("Relative error between mean measure and mean prediction (absolut value)");
 rel_err_mean
