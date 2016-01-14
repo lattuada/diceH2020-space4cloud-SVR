@@ -3,11 +3,13 @@ close all hidden
 clc
 
 %% Parameters
-query = "R2_two_cols";
+query = "R5_two_cols";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
+
+plot_subdivisions = 20;
 
 %% Real stuff
 [values, sample] = read_from_directory ([base_dir, query, "/small"]);
@@ -55,8 +57,9 @@ RMSEs = zeros (1, 4);
 Cs = zeros (1, 4);
 Es = zeros (1, 4);
 predictions = zeros (numel (ycv), 4);
-w = cell (1, 2);
-b = cell (1, 2);
+coefficients = cell (1, 4);
+SVs = cell (1, 4);
+b = cell (1, 4);
 
 %% White box model, nCores
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 0 -q -h 0", C_range, E_range);
@@ -66,7 +69,8 @@ model = svmtrain (ytr, Xtr, options);
 Cs(1) = C;
 Es(1) = eps;
 RMSEs(1) = sqrt (accuracy(2));
-w{1} = model.SVs' * model.sv_coef;
+coefficients{1} = model.sv_coef;
+SVs{1} = model.SVs;
 b{1} = - model.rho;
 
 %% White box model, nCores^(-1)
@@ -77,7 +81,8 @@ model = svmtrain (ytr_nCores, Xtr_nCores, options);
 Cs(2) = C;
 Es(2) = eps;
 RMSEs(2) = sqrt (accuracy(2));
-w{2} = model.SVs' * model.sv_coef;
+coefficients{2} = model.sv_coef;
+SVs{2} = model.SVs;
 b{2} = - model.rho;
 
 %% Black box model, Polynomial
@@ -88,6 +93,9 @@ model = svmtrain (ytr, Xtr, options);
 Cs(3) = C;
 Es(3) = eps;
 RMSEs(3) = sqrt (accuracy(2));
+coefficients{3} = model.sv_coef;
+SVs{3} = model.SVs;
+b{3} = - model.rho;
 
 %% Black box model, RBF
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, "-s 3 -t 2 -q -h 0", C_range, E_range);
@@ -97,6 +105,9 @@ model = svmtrain (ytr, Xtr, options);
 Cs(4) = C;
 Es(4) = eps;
 RMSEs(4) = sqrt (accuracy(2));
+coefficients{4} = model.sv_coef;
+SVs{4} = model.SVs;
+b{4} = - model.rho;
 
 robust_avg_value = median (ycv);
 
@@ -121,45 +132,18 @@ rel_err_mean = abs (err_mean / mean_y);
 
 %% Plots
 switch (dimensions)
-  case {1}
-    figure;
-    plot (X, y, "g+");
-    hold on;
-    plot (big_X, big_y, "bd");
-    plot (Xcv, ycv, "rx");
-    func = @(x) w{1} .* x + b{1};
-    extremes = xlim ();
-    x = linspace (extremes(1), extremes(2), 10);
-    plot (x, func (x), "r-");
-    axis auto;
-    title ("Linear kernels");
-    grid on;
-    
-    figure;
-    plot (X_nCores, y_nCores, "g+");
-    hold on;
-    plot (big_X_nCores, big_y_nCores, "bd");
-    plot (Xcv_nCores, ycv_nCores, "rx");
-    func = @(x) w{2} .* x + b{2};
-    extremes = xlim ();
-    x = linspace (extremes(1), extremes(2), 10);
-    plot (x, func (x), "r-");
-    axis auto;
-    title ('Linear kernels, nCores^{- 1}');
-    grid on;
   case {2}
     figure;
     plot3 (X(:, 1), X(:, 2), y, "g+");
     hold on;
     plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
     plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
-    func = @(x, y) w{1}(1) .* x + w{1}(2) .* y + b{1};
-    extremes = xlim ();
-    x = linspace (extremes(1), extremes(2), 10);
-    extremes = xlim ();
-    x = linspace (extremes(1), extremes(2), 10);
-    extremes = ylim ();
-    yy = linspace (extremes(1), extremes(2), 10);
+    w = SVs{1}' * coefficients{1};
+    func = @(x, y) w(1) .* x + w(2) .* y + b{1};
+    Ms = max ([X; big_X]);
+    ms = min ([X; big_X]);
+    x = linspace (ms(1), Ms(1), plot_subdivisions);
+    yy = linspace (ms(2), Ms(2), plot_subdivisions);
     [XX, YY] = meshgrid (x, yy);
     surf (XX, YY, func (XX, YY));
     axis auto;
@@ -171,15 +155,39 @@ switch (dimensions)
     hold on;
     plot3 (big_X_nCores(:, 1), big_X_nCores(:, 2), big_y_nCores, "bd");
     plot3 (Xcv_nCores(:, 1), Xcv_nCores(:, 2), ycv_nCores, "rx");
-    func = @(x, y) w{2}(1) .* x + w{2}(2) .* y + b{2};
-    extremes = xlim ();
-    x = linspace (extremes(1), extremes(2), 10);
-    extremes = ylim ();
-    yy = linspace (extremes(1), extremes(2), 10);
+    w = SVs{2}' * coefficients{2};
+    func = @(x, y) w(1) .* x + w(2) .* y + b{2};
+    Ms = max ([X_nCores; big_X_nCores]);
+    ms = min ([X_nCores; big_X_nCores]);
+    x = linspace (ms(1), Ms(1), plot_subdivisions);
+    yy = linspace (ms(2), Ms(2), plot_subdivisions);
     [XX, YY] = meshgrid (x, yy);
     surf (XX, YY, func (XX, YY));
     axis auto;
     title ('Linear kernels, nCores^{- 1}');
+    grid on;
+    
+    figure;
+    plot3 (X(:, 1), X(:, 2), y, "g+");
+    hold on;
+    plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
+    plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
+    Ms = max ([X; big_X]);
+    ms = min ([X; big_X]);
+    x = linspace (ms(1), Ms(1), plot_subdivisions);
+    yy = linspace (ms(2), Ms(2), plot_subdivisions);
+    [XX, YY] = meshgrid (x, yy);
+    [nr, nc] = size (XX);
+    ZZ = zeros (nr, nc);
+    for (r = 1:nr)
+      for (c = 1:nc)
+        point = [XX(r, c), YY(r, c)];
+        ZZ(r, c) = coefficients{4}' * exp (sumsq (bsxfun (@minus, SVs{4}, point), 2) / 2);
+      endfor
+    endfor
+    surf (XX, YY, ZZ);
+    axis auto;
+    title ("RBF kernels");
     grid on;
 endswitch
 
