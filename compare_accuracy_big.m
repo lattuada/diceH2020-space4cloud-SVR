@@ -3,7 +3,7 @@ close all hidden
 clc
 
 %% Parameters
-query = "R1_two_cols";
+query = "R2_two_cols";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
 C_range = linspace (0.1, 5, 20);
@@ -23,7 +23,6 @@ big_sample_nCores(:, end) = 1 ./ big_sample_nCores(:, end);
 
 big_size = max (big_sample(:, end - 1));
 everything = [values, sample; big_values, big_sample];
-before = size (everything);
 everything = clear_outliers (everything);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
@@ -199,5 +198,5 @@ max_abs_err
 mean_abs_err
 min_abs_err
 
-display ("Relative error between mean measure and mean prediction (absolut value)");
+display ("Relative error between mean measure and mean prediction (absolute value)");
 rel_err_mean
