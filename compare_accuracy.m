@@ -3,7 +3,7 @@ close all hidden
 clc
 
 %% Parameters
-query = "R5_two_cols";
+query = "R1";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
 C_range = linspace (0.1, 5, 20);
@@ -30,16 +30,18 @@ complete_sample_nCores(:, end) = 1 ./ complete_sample_nCores(:, end);
 everything = clear_outliers (complete_sample);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
-[everything, ~, ~] = zscore (everything);
+[everything, mu, sigma] = zscore (everything);
 y = everything(idx_small, 1);
 X = everything(idx_small, 2:end);
 big_y = everything(idx_big, 1);
 big_X = everything(idx_big, 2:end);
+mu_y = mu(1);
+sigma_y = sigma(1);
 
 everything = clear_outliers (complete_sample_nCores);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
-[everything, ~, ~] = zscore (everything);
+everything = zscore (everything);
 y_nCores = everything(idx_small, 1);
 X_nCores = everything(idx_small, 2:end);
 big_y_nCores = everything(idx_big, 1);
@@ -106,13 +108,16 @@ coefficients{4} = model.sv_coef;
 SVs{4} = model.SVs;
 b{4} = - model.rho;
 
-robust_avg_value = median (ycv);
-
 percent_RMSEs = 100 * RMSEs / max (RMSEs);
-rel_RMSEs = RMSEs / abs (robust_avg_value);
+rel_RMSEs = RMSEs / abs (median (ycv));
 
-abs_err = abs (predictions - ycv);
-rel_err = abs_err ./ abs (ycv);
+%% Unscale
+real_predictions = mu_y + predictions * sigma_y;
+cv_values = mu_y + ycv * sigma_y;
+
+%% Compute metrics
+abs_err = abs (real_predictions - cv_values);
+rel_err = abs_err ./ cv_values;
 
 max_rel_err = max (rel_err);
 min_rel_err = min (rel_err);
@@ -122,10 +127,10 @@ max_abs_err = max (abs_err);
 mean_abs_err = mean (abs_err);
 min_abs_err = min (abs_err);
 
-mean_y = mean (ycv);
-mean_predictions = mean (predictions);
-err_mean = mean_predictions - mean_y;
-rel_err_mean = abs (err_mean / mean_y);
+mean_values = mean (cv_values);
+mean_predictions = mean (real_predictions);
+err_mean = mean_predictions - mean_values;
+rel_err_mean = err_mean / mean_values;
 
 %% Plots
 if (printPlots && (dimensions == 2))
