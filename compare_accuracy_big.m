@@ -117,7 +117,6 @@ SVs{4} = model.SVs;
 b{4} = - model.rho;
 
 percent_RMSEs = 100 * RMSEs / max (RMSEs);
-rel_RMSEs = RMSEs / abs (median (ycv));
 
 %% Unscale
 real_predictions = mu_y + predictions * sigma_y;
@@ -201,7 +200,6 @@ endif
 display ("Root Mean Square Errors");
 RMSEs
 percent_RMSEs
-rel_RMSEs
 
 display ("Relative errors (absolute values)");
 max_rel_err
