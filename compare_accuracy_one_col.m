@@ -18,18 +18,28 @@ plot_subdivisions = 20;
 
 %% Real stuff
 sample = read_from_directory ([base_dir, query, "/", dataSize]);
+
+%% Clear outliers grouping by number of cores
+sample_before = sample;
+sample = [];
+cores = unique (sort (sample_before(:, end)))';
+for (cr = cores)
+  idx = (sample_before(:, end) == cr);
+  loc = clear_outliers (sample_before(idx, :));
+  sample = [sample; loc];
+endfor
+
+%% Shuffle sample
 sample = sample(randperm (size (sample, 1)), :);
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
-sample = clear_outliers (sample);
 [scaled, ~, ~] = zscore (sample);
 y = scaled(:, 1);
 X = scaled(:, 2:end);
 [ytr, ytst, ycv] = split_sample (y, train_frac, test_frac);
 [Xtr, Xtst, Xcv] = split_sample (X, train_frac, test_frac);
 
-sample_nCores = clear_outliers (sample_nCores);
 [scaled_nCores, ~, ~] = zscore (sample_nCores);
 y_nCores = scaled_nCores(:, 1);
 X_nCores = scaled_nCores(:, 2:end);
