@@ -7,6 +7,8 @@ query = "R1_one_col";
 dataSize = "250";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
+printPlots = false;
+
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
@@ -133,53 +135,55 @@ for (jj = 1:length (err_on_avg))
 endfor
 
 %% Plots
-figure;
-plot (X, y, "g+");
-hold on;
-cores = unique (sort (X));
-plot (cores, avgs(:, 1), "kd");
-w = SVs{1}' * coefficients{1};
-func = @(x) w .* x + b{1};
-M = max (X);
-m = min (X);
-x = linspace (m, M, plot_subdivisions);
-plot (x, func (x), "r-", "linewidth", 2);
-axis auto;
-title ("Linear kernels");
-grid on;
-
-figure;
-plot (X_nCores, y_nCores, "g+");
-hold on;
-cores = unique (sort (X_nCores));
-plot (cores, avgs(:, 2), "kd");
-w = SVs{2}' * coefficients{2};
-func = @(x) w .* x + b{2};
-M = max (X_nCores);
-m = min (X_nCores);
-x = linspace (m, M, plot_subdivisions);
-plot (x, func (x), "r-", "linewidth", 2);
-axis auto;
-title ('Linear kernels, nCores^{- 1}');
-grid on;
-
-figure;
-plot (X, y, "g+");
-hold on;
-cores = unique (sort (X));
-plot (cores, avgs(:, 4), "kd");
-M = max (X);
-m = min (X);
-x = linspace (m, M, plot_subdivisions);
-z = zeros (size (x));
-for (ii = 1:numel (z))
-  point = x(ii);
-  z(ii) = coefficients{4}' * exp (bsxfun (@minus, SVs{4}, point) .^ 2);
-endfor
-plot (x, z, "r-", "linewidth", 2);
-axis auto;
-title ("RBF kernels");
-grid on;
+if (printPlots)
+  figure;
+  plot (X, y, "g+");
+  hold on;
+  cores = unique (sort (X));
+  plot (cores, avgs(:, 1), "kd");
+  w = SVs{1}' * coefficients{1};
+  func = @(x) w .* x + b{1};
+  M = max (X);
+  m = min (X);
+  x = linspace (m, M, plot_subdivisions);
+  plot (x, func (x), "r-", "linewidth", 2);
+  axis auto;
+  title ("Linear kernels");
+  grid on;
+  
+  figure;
+  plot (X_nCores, y_nCores, "g+");
+  hold on;
+  cores = unique (sort (X_nCores));
+  plot (cores, avgs(:, 2), "kd");
+  w = SVs{2}' * coefficients{2};
+  func = @(x) w .* x + b{2};
+  M = max (X_nCores);
+  m = min (X_nCores);
+  x = linspace (m, M, plot_subdivisions);
+  plot (x, func (x), "r-", "linewidth", 2);
+  axis auto;
+  title ('Linear kernels, nCores^{- 1}');
+  grid on;
+  
+  figure;
+  plot (X, y, "g+");
+  hold on;
+  cores = unique (sort (X));
+  plot (cores, avgs(:, 4), "kd");
+  M = max (X);
+  m = min (X);
+  x = linspace (m, M, plot_subdivisions);
+  z = zeros (size (x));
+  for (ii = 1:numel (z))
+    point = x(ii);
+    z(ii) = coefficients{4}' * exp (bsxfun (@minus, SVs{4}, point) .^ 2);
+  endfor
+  plot (x, z, "r-", "linewidth", 2);
+  axis auto;
+  title ("RBF kernels");
+  grid on;
+endif
 
 %% Print metrics
 display ("Root Mean Square Errors");
