@@ -5,15 +5,20 @@ clc
 train_frac = 0.8;
 test_frac = 0.2;
 
-[values, sample] = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/small");
-[values_big, sample_big] = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/big");
-[everything, ~, ~] = zscore ([values, sample]);
-y = everything(:, 1);
-X = everything(:, 2:end);
-[everything, ~, ~] = zscore ([values_big, sample_big]);
-ycv = everything(:, 1);
-Xcv = everything(:, 2:end);
-[ytr, Xtr, ytst, Xtst, ~, ~] = split_sample (y, X, train_frac, test_frac);
+sample = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/small");
+sample_big = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/big");
+
+scaled = zscore (sample_big);
+ycv = scaled(:, 1);
+Xcv = scaled(:, 2:end);
+scaled = zscore (sample);
+
+scaled = scaled(randperm (size (scaled, 1)), :);
+[train, test, ~] = split_sample (scaled, train_frac, test_frac);
+ytr = train(:, 1);
+Xtr = train(:, 2:end);
+ytst = test(:, 1);
+Xtst = test(:, 2:end);
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);

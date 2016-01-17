@@ -9,23 +9,24 @@ base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
+test_frac = 0.6;
+train_frac = 0.2;
+
 plot_subdivisions = 20;
 
 %% Real stuff
-[values, sample] = read_from_directory ([base_dir, query, "/small"]);
-[big_values, big_sample] = read_from_directory ([base_dir, query, "/big"]);
+sample = read_from_directory ([base_dir, query, "/small"]);
+big_sample = read_from_directory ([base_dir, query, "/big"]);
 
-dimensions = size (sample, 2);
-
-sample_nCores = sample;
-sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
-
-big_sample_nCores = big_sample;
-big_sample_nCores(:, end) = 1 ./ big_sample_nCores(:, end);
-
+dimensions = size (sample, 2) - 1;
 big_size = max (big_sample(:, end - 1));
-everything = [values, sample; big_values, big_sample];
-everything = clear_outliers (everything);
+
+complete_sample = [sample; big_sample];
+complete_sample = complete_sample(randperm (size (complete_sample, 1)), :);
+complete_sample_nCores = complete_sample;
+complete_sample_nCores(:, end) = 1 ./ complete_sample_nCores(:, end);
+
+everything = clear_outliers (complete_sample);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
 [everything, ~, ~] = zscore (everything);
@@ -34,9 +35,7 @@ X = everything(idx_small, 2:end);
 big_y = everything(idx_big, 1);
 big_X = everything(idx_big, 2:end);
 
-big_size = max (big_sample_nCores(:, end - 1));
-everything = [values, sample_nCores; big_values, big_sample_nCores];
-everything = clear_outliers (everything);
+everything = clear_outliers (complete_sample_nCores);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
 [everything, ~, ~] = zscore (everything);
@@ -45,13 +44,10 @@ X_nCores = everything(idx_small, 2:end);
 big_y_nCores = everything(idx_big, 1);
 big_X_nCores = everything(idx_big, 2:end);
 
-test_frac = 0.6;
-train_frac = 0.2;
-
-[ytr, Xtr, ytst, Xtst, ycv, Xcv] = ...
-  split_sample ([y; big_y], [X; big_X], train_frac, test_frac);
-[ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
-  split_sample ([y_nCores; big_y_nCores], [X_nCores; big_X_nCores], train_frac, test_frac);
+[ytr, ytst, ycv] = split_sample ([y; big_y], train_frac, test_frac);
+[Xtr, Xtst, Xcv] = split_sample ([X; big_X], train_frac, test_frac);
+[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample ([y_nCores; big_y_nCores], train_frac, test_frac);
+[Xtr_nCores, Xtst_nCores, Xcv_nCores] = split_sample ([X_nCores; big_X_nCores], train_frac, test_frac);
 
 RMSEs = zeros (1, 4);
 Cs = zeros (1, 4);

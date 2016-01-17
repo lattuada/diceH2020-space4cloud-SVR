@@ -12,19 +12,20 @@ E_range = linspace (0.1, 5, 20);
 plot_subdivisions = 20;
 
 %% Real stuff
-[values, sample] = read_from_directory ([base_dir, query, "/small"]);
-[big_values, big_sample] = read_from_directory ([base_dir, query, "/big"]);
+sample = read_from_directory ([base_dir, query, "/small"]);
+big_sample = read_from_directory ([base_dir, query, "/big"]);
 
-dimensions = size (sample, 2);
+dimensions = size (sample, 2) - 1;
+big_size = max (big_sample(:, end - 1));
 
+sample = sample(randperm (size (sample, 1)), :);
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
 big_sample_nCores = big_sample;
 big_sample_nCores(:, end) = 1 ./ big_sample_nCores(:, end);
 
-big_size = max (big_sample(:, end - 1));
-everything = [values, sample; big_values, big_sample];
+everything = [sample; big_sample];
 everything = clear_outliers (everything);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
@@ -34,8 +35,7 @@ X = everything(idx_small, 2:end);
 big_y = everything(idx_big, 1);
 big_X = everything(idx_big, 2:end);
 
-big_size = max (big_sample_nCores(:, end - 1));
-everything = [values, sample_nCores; big_values, big_sample_nCores];
+everything = [sample_nCores; big_sample_nCores];
 everything = clear_outliers (everything);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
@@ -48,9 +48,10 @@ big_X_nCores = everything(idx_big, 2:end);
 test_frac = length (big_y) / length (y);
 train_frac = 1 - test_frac;
 
-[ytr, Xtr, ytst, Xtst, ~, ~] = split_sample (y, X, train_frac, test_frac);
-[ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ~, ~] = ...
-  split_sample (y_nCores, X_nCores, train_frac, test_frac);
+[ytr, ytst, ~] = split_sample (y, train_frac, test_frac);
+[Xtr, Xtst, ~] = split_sample (X, train_frac, test_frac);
+[ytr_nCores, ytst_nCores, ~] = split_sample (y_nCores, train_frac, test_frac);
+[Xtr_nCores, Xtst_nCores, ~] = split_sample (X_nCores, train_frac, test_frac);
 ycv = big_y;
 Xcv = big_X;
 ycv_nCores = big_y_nCores;

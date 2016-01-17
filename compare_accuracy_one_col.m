@@ -7,36 +7,34 @@ query = "R1_one_col";
 dataSize = "250";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
-printPlots = false;
+train_frac = 0.6;
+test_frac = 0.2;
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
+printPlots = false;
 plot_subdivisions = 20;
 
 %% Real stuff
-[values, sample] = read_from_directory ([base_dir, query, "/", dataSize]);
+sample = read_from_directory ([base_dir, query, "/", dataSize]);
+sample = sample(randperm (size (sample, 1)), :);
+sample_nCores = sample;
+sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
-sample_nCores = 1 ./ sample;
+sample = clear_outliers (sample);
+[scaled, ~, ~] = zscore (sample);
+y = scaled(:, 1);
+X = scaled(:, 2:end);
+[ytr, ytst, ycv] = split_sample (y, train_frac, test_frac);
+[Xtr, Xtst, Xcv] = split_sample (X, train_frac, test_frac);
 
-everything = [values, sample];
-everything = clear_outliers (everything);
-[everything, ~, ~] = zscore (everything);
-y = everything(:, 1);
-X = everything(:, 2:end);
-
-everything = [values, sample_nCores];
-everything = clear_outliers (everything);
-[everything, ~, ~] = zscore (everything);
-y_nCores = everything(:, 1);
-X_nCores = everything(:, 2:end);
-
-train_frac = 0.6;
-test_frac = 0.2;
-
-[ytr, Xtr, ytst, Xtst, ycv, Xcv] = split_sample (y, X, train_frac, test_frac);
-[ytr_nCores, Xtr_nCores, ytst_nCores, Xtst_nCores, ycv_nCores, Xcv_nCores] = ...
-  split_sample (y_nCores, X_nCores, train_frac, test_frac);
+sample_nCores = clear_outliers (sample_nCores);
+[scaled_nCores, ~, ~] = zscore (sample_nCores);
+y_nCores = scaled_nCores(:, 1);
+X_nCores = scaled_nCores(:, 2:end);
+[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample (y_nCores, train_frac, test_frac);
+[Xtr_nCores, Xtst_nCores, Xcv_nCores] = split_sample (X_nCores, train_frac, test_frac);
 
 RMSEs = zeros (1, 4);
 Cs = zeros (1, 4);
