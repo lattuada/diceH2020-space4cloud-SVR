@@ -7,10 +7,10 @@ test_frac = 0.2;
 
 [values, sample] = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/small");
 [values_big, sample_big] = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1/big");
-[everything, ~, ~] = scale ([values, sample]);
+[everything, ~, ~] = zscore ([values, sample]);
 y = everything(:, 1);
 X = everything(:, 2:end);
-[everything, ~, ~] = scale ([values_big, sample_big]);
+[everything, ~, ~] = zscore ([values_big, sample_big]);
 ycv = everything(:, 1);
 Xcv = everything(:, 2:end);
 [ytr, Xtr, ytst, Xtst, ~, ~] = split_sample (y, X, train_frac, test_frac);
