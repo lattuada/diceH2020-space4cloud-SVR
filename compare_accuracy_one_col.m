@@ -34,16 +34,16 @@ sample = sample(randperm (size (sample, 1)), :);
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 
-[scaled, ~, ~] = zscore (sample);
-y = scaled(:, 1);
-X = scaled(:, 2:end);
+values = sample(:, 1);
+features = sample(:, 2:end);
+[y, mu_y, sigma_y] = zscore (values);
+[X, mu_X, sigma_X] = zscore (features);
 [ytr, ytst, ycv] = split_sample (y, train_frac, test_frac);
 [Xtr, Xtst, Xcv] = split_sample (X, train_frac, test_frac);
 
-[scaled_nCores, ~, ~] = zscore (sample_nCores);
-y_nCores = scaled_nCores(:, 1);
-X_nCores = scaled_nCores(:, 2:end);
-[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample (y_nCores, train_frac, test_frac);
+features_nCores = sample_nCores(:, 2:end);
+[X_nCores, mu_X_nCores, sigma_X_nCores] = zscore (features_nCores);
+[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample (y, train_frac, test_frac);
 [Xtr_nCores, Xtst_nCores, Xcv_nCores] = split_sample (X_nCores, train_frac, test_frac);
 
 RMSEs = zeros (1, 4);
@@ -103,13 +103,16 @@ coefficients{4} = models{4}.sv_coef;
 SVs{4} = models{4}.SVs;
 b{4} = - models{4}.rho;
 
-robust_avg_value = median (ycv);
-
 percent_RMSEs = 100 * RMSEs / max (RMSEs);
-rel_RMSEs = RMSEs / abs (robust_avg_value);
+rel_RMSEs = RMSEs / abs (median (ycv));
 
-abs_err = abs (predictions - ycv);
-rel_err = abs_err ./ abs (ycv);
+%% Unscale
+real_predictions = mu_y + predictions * sigma_y;
+cv_values = mu_y + ycv * sigma_y;
+
+%% Compute metrics
+abs_err = abs (real_predictions - cv_values);
+rel_err = abs_err ./ cv_values;
 
 max_rel_err = max (rel_err);
 min_rel_err = min (rel_err);
@@ -119,27 +122,27 @@ max_abs_err = max (abs_err);
 mean_abs_err = mean (abs_err);
 min_abs_err = min (abs_err);
 
-mean_y = mean (ycv);
-mean_predictions = mean (predictions);
-err_mean = mean_predictions - mean_y;
-rel_err_mean = abs (err_mean / mean_y);
+mean_y = mean (cv_values);
+mean_predictions = mean (real_predictions);
+rel_err_mean = (mean_predictions - mean_y) / mean_y;
 
-%% Avg
 avgs = zeros (length (unique (sort (X))), 4);
 err_on_avg = zeros (1, 4);
-for (jj = 1:length (err_on_avg))
+for (ii = 1:length (err_on_avg))
   dataset = X;
-  if (jj == 2)
+  if (ii == 2)
     dataset = X_nCores;
   endif
   cores = unique (sort (dataset));
   avg = zeros (size (cores));
-  for (ii = 1:numel (cores))
-    avg(ii) = mean (y(dataset == cores(ii)));
+  for (jj = 1:numel (cores))
+    avg(jj) = mean (y(dataset == cores(jj)));
   endfor
-  avgs(:, jj) = avg;
-  [pred, ~, ~] = svmpredict (avg, cores, models{jj});
-  err_on_avg(jj) = mean (abs ((pred - avg) ./ avg));
+  avgs(:, ii) = avg;
+  [pred, ~, ~] = svmpredict (avg, cores, models{ii});
+  pred = mu_y + pred * sigma_y;
+  avg = mu_y + avg * sigma_y;
+  err_on_avg(ii) = max (abs (pred - avg) ./ avg);
 endfor
 
 %% Plots
@@ -160,7 +163,7 @@ if (printPlots)
   grid on;
   
   figure;
-  plot (X_nCores, y_nCores, "g+");
+  plot (X_nCores, y, "g+");
   hold on;
   cores = unique (sort (X_nCores));
   plot (cores, avgs(:, 2), "kd");
@@ -209,8 +212,8 @@ max_abs_err
 mean_abs_err
 min_abs_err
 
-display ("Relative error between mean measure and mean prediction (absolute value)");
+display ("Relative error between mean measure and mean prediction");
 rel_err_mean
 
-display ("Relative error between mean measure and mean prediction, grouped by number of cores (absolute value)");
+display ("Relative error between mean measure and mean prediction, grouped by number of cores");
 err_on_avg
