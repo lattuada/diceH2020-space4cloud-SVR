@@ -12,6 +12,7 @@ E_range = linspace (0.1, 5, 20);
 test_frac = 0.6;
 train_frac = 0.2;
 
+printPlots = false;
 plot_subdivisions = 20;
 
 %% Real stuff
@@ -127,65 +128,64 @@ err_mean = mean_predictions - mean_y;
 rel_err_mean = abs (err_mean / mean_y);
 
 %% Plots
-switch (dimensions)
-  case {2}
-    figure;
-    plot3 (X(:, 1), X(:, 2), y, "g+");
-    hold on;
-    plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
-    plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
-    w = SVs{1}' * coefficients{1};
-    func = @(x, y) w(1) .* x + w(2) .* y + b{1};
-    Ms = max ([X; big_X]);
-    ms = min ([X; big_X]);
-    x = linspace (ms(1), Ms(1), plot_subdivisions);
-    yy = linspace (ms(2), Ms(2), plot_subdivisions);
-    [XX, YY] = meshgrid (x, yy);
-    surf (XX, YY, func (XX, YY));
-    axis auto;
-    title ("Linear kernels");
-    grid on;
-    
-    figure;
-    plot3 (X_nCores(:, 1), X_nCores(:, 2), y_nCores, "g+");
-    hold on;
-    plot3 (big_X_nCores(:, 1), big_X_nCores(:, 2), big_y_nCores, "bd");
-    plot3 (Xcv_nCores(:, 1), Xcv_nCores(:, 2), ycv_nCores, "rx");
-    w = SVs{2}' * coefficients{2};
-    func = @(x, y) w(1) .* x + w(2) .* y + b{2};
-    Ms = max ([X_nCores; big_X_nCores]);
-    ms = min ([X_nCores; big_X_nCores]);
-    x = linspace (ms(1), Ms(1), plot_subdivisions);
-    yy = linspace (ms(2), Ms(2), plot_subdivisions);
-    [XX, YY] = meshgrid (x, yy);
-    surf (XX, YY, func (XX, YY));
-    axis auto;
-    title ('Linear kernels, nCores^{- 1}');
-    grid on;
-    
-    figure;
-    plot3 (X(:, 1), X(:, 2), y, "g+");
-    hold on;
-    plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
-    plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
-    Ms = max ([X; big_X]);
-    ms = min ([X; big_X]);
-    x = linspace (ms(1), Ms(1), plot_subdivisions);
-    yy = linspace (ms(2), Ms(2), plot_subdivisions);
-    [XX, YY] = meshgrid (x, yy);
-    [nr, nc] = size (XX);
-    ZZ = zeros (nr, nc);
-    for (r = 1:nr)
-      for (c = 1:nc)
-        point = [XX(r, c), YY(r, c)];
-        ZZ(r, c) = coefficients{4}' * exp (sumsq (bsxfun (@minus, SVs{4}, point), 2) / 2);
-      endfor
+if (printPlots && (dimensions == 2))
+  figure;
+  plot3 (X(:, 1), X(:, 2), y, "g+");
+  hold on;
+  plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
+  plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
+  w = SVs{1}' * coefficients{1};
+  func = @(x, y) w(1) .* x + w(2) .* y + b{1};
+  Ms = max ([X; big_X]);
+  ms = min ([X; big_X]);
+  x = linspace (ms(1), Ms(1), plot_subdivisions);
+  yy = linspace (ms(2), Ms(2), plot_subdivisions);
+  [XX, YY] = meshgrid (x, yy);
+  surf (XX, YY, func (XX, YY));
+  axis auto;
+  title ("Linear kernels");
+  grid on;
+  
+  figure;
+  plot3 (X_nCores(:, 1), X_nCores(:, 2), y_nCores, "g+");
+  hold on;
+  plot3 (big_X_nCores(:, 1), big_X_nCores(:, 2), big_y_nCores, "bd");
+  plot3 (Xcv_nCores(:, 1), Xcv_nCores(:, 2), ycv_nCores, "rx");
+  w = SVs{2}' * coefficients{2};
+  func = @(x, y) w(1) .* x + w(2) .* y + b{2};
+  Ms = max ([X_nCores; big_X_nCores]);
+  ms = min ([X_nCores; big_X_nCores]);
+  x = linspace (ms(1), Ms(1), plot_subdivisions);
+  yy = linspace (ms(2), Ms(2), plot_subdivisions);
+  [XX, YY] = meshgrid (x, yy);
+  surf (XX, YY, func (XX, YY));
+  axis auto;
+  title ('Linear kernels, nCores^{- 1}');
+  grid on;
+  
+  figure;
+  plot3 (X(:, 1), X(:, 2), y, "g+");
+  hold on;
+  plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
+  plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
+  Ms = max ([X; big_X]);
+  ms = min ([X; big_X]);
+  x = linspace (ms(1), Ms(1), plot_subdivisions);
+  yy = linspace (ms(2), Ms(2), plot_subdivisions);
+  [XX, YY] = meshgrid (x, yy);
+  [nr, nc] = size (XX);
+  ZZ = zeros (nr, nc);
+  for (r = 1:nr)
+    for (c = 1:nc)
+      point = [XX(r, c), YY(r, c)];
+      ZZ(r, c) = coefficients{4}' * exp (sumsq (bsxfun (@minus, SVs{4}, point), 2) / 2);
     endfor
-    surf (XX, YY, ZZ);
-    axis auto;
-    title ("RBF kernels");
-    grid on;
-endswitch
+  endfor
+  surf (XX, YY, ZZ);
+  axis auto;
+  title ("RBF kernels");
+  grid on;
+endif
 
 %% Print metrics
 display ("Root Mean Square Errors");
