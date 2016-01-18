@@ -17,7 +17,6 @@ m_cv = length (ycv);
 m = round (linspace (m_cv, m_train, 20));
 MSE_train = zeros (size (m));
 MSE_cv = zeros (size (m));
-steps = zeros (size (m));
 
 for (ii = 1:length (m))
   m_part = m(ii);

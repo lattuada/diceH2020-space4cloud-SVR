@@ -2,7 +2,7 @@
 ## @deftypefn {Function File} {[@var{training}, @var{testing}, @var{cv}] =} split_sample (@var{sample}, @var{train}, @var{test})
 ##
 ## Split @var{sample} so that a fraction @var{train}, @var{test}
-## of the examples is, respectively, in the @var{training} set,
+## of the examples is, respectively, in the @var{training} set
 ## and in the @var{testing} set.
 ## The remaining examples are in the @var{cv} set.
 ##
