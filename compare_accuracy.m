@@ -47,8 +47,6 @@ mu_X = mu(2:end);
 sigma_X = sigma(2:end);
 
 shuffled_nCores = clean_sample_nCores(idx, :);
-idx_small = (shuffled_nCores(:, end - 1) < big_size);
-idx_big = (shuffled_nCores(:, end - 1) == big_size);
 [scaled_nCores, mu, sigma] = zscore (shuffled_nCores);
 y_nCores = scaled_nCores(idx_small, 1);
 X_nCores = scaled_nCores(idx_small, 2:end);
