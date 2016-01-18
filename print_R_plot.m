@@ -5,7 +5,10 @@ clc
 query = "R5";
 directory = ["/home/gianniti/policloud-runs/", query];
 
-[values, sample] = read_from_directory (directory);
+data = read_from_directory (directory);
+
+values = data(:, 1);
+sample = data(:, 2:end);
 
 plot_R (values, sample);
 

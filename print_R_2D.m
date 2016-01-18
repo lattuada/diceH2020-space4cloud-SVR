@@ -5,7 +5,10 @@ clc
 query = "R5";
 directory = ["/home/gianniti/policloud-runs/", query];
 
-[y, X] = read_from_directory (directory);
+sample = read_from_directory (directory);
+
+y = sample(:, 1);
+X = sample(:, 2:end);
 
 dataSize = X(:, end-1);
 sizes = unique (sort (dataSize))';

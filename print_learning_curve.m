@@ -11,8 +11,8 @@ sample_big = read_from_directory ("/home/eugenio/Desktop/cineca-runs-20150111/R1
 scaled = zscore (sample_big);
 ycv = scaled(:, 1);
 Xcv = scaled(:, 2:end);
-scaled = zscore (sample);
 
+scaled = zscore (sample);
 scaled = scaled(randperm (size (scaled, 1)), :);
 [train, test, ~] = split_sample (scaled, train_frac, test_frac);
 ytr = train(:, 1);
