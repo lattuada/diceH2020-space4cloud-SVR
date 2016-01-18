@@ -31,6 +31,7 @@ for (cr = cores)
 endfor
 
 %% Shuffle sample
+rand ("seed", 17);
 sample = sample(randperm (size (sample, 1)), :);
 sample_nCores = sample;
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
