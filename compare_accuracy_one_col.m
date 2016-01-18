@@ -13,7 +13,8 @@ test_frac = 0.2;
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
-printPlots = false;
+printPlots = true;
+scalePlots = true;
 plot_subdivisions = 20;
 
 %% Real stuff
@@ -147,49 +148,99 @@ endfor
 %% Plots
 if (printPlots)
   figure;
-  plot (X, y, "g+");
+  abscissae = X;
+  ordinates = y;
+  if (scalePlots)
+    abscissae = features;
+    ordinates = values;
+  endif
+  plot (abscissae, ordinates, "gx");
   hold on;
   cores = unique (sort (X));
-  plot (cores, avgs(:, 1), "kd");
+  abscissae = cores;
+  ordinates = avgs(:, 1);
+  if (scalePlots)
+    abscissae = mu_X + abscissae * sigma_X;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "kd");
   w = SVs{1}' * coefficients{1};
   func = @(x) w .* x + b{1};
   M = max (X);
   m = min (X);
-  x = linspace (m, M, plot_subdivisions);
-  plot (x, func (x), "r-", "linewidth", 2);
+  abscissae = linspace (m, M, plot_subdivisions);
+  ordinates = func (abscissae);
+  if (scalePlots)
+    abscissae = mu_X + abscissae * sigma_X;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "r-", "linewidth", 2);
   axis auto;
   title ("Linear kernels");
   grid on;
   
   figure;
-  plot (X_nCores, y, "g+");
+  abscissae = X_nCores;
+  ordinates = y;
+  if (scalePlots)
+    abscissae = features_nCores;
+    ordinates = values;
+  endif
+  plot (abscissae, ordinates, "gx");
   hold on;
   cores = unique (sort (X_nCores));
-  plot (cores, avgs(:, 2), "kd");
+  abscissae = cores;
+  ordinates = avgs(:, 2);
+  if (scalePlots)
+    abscissae = mu_X_nCores + abscissae * sigma_X_nCores;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "kd");
   w = SVs{2}' * coefficients{2};
   func = @(x) w .* x + b{2};
   M = max (X_nCores);
   m = min (X_nCores);
-  x = linspace (m, M, plot_subdivisions);
-  plot (x, func (x), "r-", "linewidth", 2);
+  abscissae = linspace (m, M, plot_subdivisions);
+  ordinates = func (abscissae);
+  if (scalePlots)
+    abscissae = mu_X_nCores + abscissae * sigma_X_nCores;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "r-", "linewidth", 2);
   axis auto;
   title ('Linear kernels, nCores^{- 1}');
   grid on;
   
   figure;
-  plot (X, y, "g+");
+  abscissae = X;
+  ordinates = y;
+  if (scalePlots)
+    abscissae = features;
+    ordinates = values;
+  endif
+  plot (abscissae, ordinates, "gx");
   hold on;
   cores = unique (sort (X));
-  plot (cores, avgs(:, 4), "kd");
+  abscissae = cores;
+  ordinates = avgs(:, 4);
+  if (scalePlots)
+    abscissae = mu_X + abscissae * sigma_X;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "kd");
   M = max (X);
   m = min (X);
-  x = linspace (m, M, plot_subdivisions);
-  z = zeros (size (x));
-  for (ii = 1:numel (z))
-    point = x(ii);
-    z(ii) = coefficients{4}' * exp (bsxfun (@minus, SVs{4}, point) .^ 2);
+  abscissae = linspace (m, M, plot_subdivisions);
+  ordinates = zeros (size (abscissae));
+  for (ii = 1:numel (ordinates))
+    point = abscissae(ii);
+    ordinates(ii) = coefficients{4}' * exp (bsxfun (@minus, SVs{4}, point) .^ 2);
   endfor
-  plot (x, z, "r-", "linewidth", 2);
+  if (scalePlots)
+    abscissae = mu_X + abscissae * sigma_X;
+    ordinates = mu_y + ordinates * sigma_y;
+  endif
+  plot (abscissae, ordinates, "r-", "linewidth", 2);
   axis auto;
   title ("RBF kernels");
   grid on;
