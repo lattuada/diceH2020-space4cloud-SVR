@@ -3,7 +3,7 @@ close all hidden
 clc
 
 %% Parameters
-query = "R1_trick";
+query = "all/max";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
 C_range = linspace (0.1, 5, 20);
@@ -13,6 +13,7 @@ train_frac = 0.6;
 test_frac = 0.2;
 
 printPlots = true;
+scalePlots = true;
 plot_subdivisions = 20;
 
 %% Real stuff
@@ -26,6 +27,8 @@ complete_sample = [sample; big_sample];
 clean_sample = clear_outliers (complete_sample);
 clean_sample_nCores = clean_sample;
 clean_sample_nCores(:, end) = 1 ./ clean_sample_nCores(:, end);
+
+rand ("seed", 17);
 idx = randperm (size (clean_sample, 1));
 
 shuffled = clean_sample(idx, :);
@@ -40,17 +43,21 @@ all_y = scaled(:, 1);
 all_X = scaled(:, 2:end);
 mu_y = mu(1);
 sigma_y = sigma(1);
+mu_X = mu(2:end);
+sigma_X = sigma(2:end);
 
 shuffled_nCores = clean_sample_nCores(idx, :);
 idx_small = (shuffled_nCores(:, end - 1) < big_size);
 idx_big = (shuffled_nCores(:, end - 1) == big_size);
-scaled_nCores = zscore (shuffled_nCores);
+[scaled_nCores, mu, sigma] = zscore (shuffled_nCores);
 y_nCores = scaled_nCores(idx_small, 1);
 X_nCores = scaled_nCores(idx_small, 2:end);
 big_y_nCores = scaled_nCores(idx_big, 1);
 big_X_nCores = scaled_nCores(idx_big, 2:end);
 all_y_nCores = scaled_nCores(:, 1);
 all_X_nCores = scaled_nCores(:, 2:end);
+mu_X_nCores = mu(2:end);
+sigma_X_nCores = sigma(2:end);
 
 [ytr, ytst, ycv] = split_sample (all_y, train_frac, test_frac);
 [Xtr, Xtst, Xcv] = split_sample (all_X, train_frac, test_frac);
@@ -139,10 +146,34 @@ rel_err_mean = err_mean / mean_values;
 %% Plots
 if (printPlots && (dimensions == 2))
   figure;
-  plot3 (X(:, 1), X(:, 2), y, "g+");
+  XX = X(:, 1);
+  YY = X(:, 2);
+  ZZ = y;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "gx");
   hold on;
-  plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
-  plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
+  XX = big_X(:, 1);
+  YY = big_X(:, 2);
+  ZZ = big_y;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "bd");
+  XX = Xcv(:, 1);
+  YY = Xcv(:, 2);
+  ZZ = ycv;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "rx");
   w = SVs{1}' * coefficients{1};
   func = @(x, y) w(1) .* x + w(2) .* y + b{1};
   Ms = max ([X; big_X]);
@@ -150,16 +181,46 @@ if (printPlots && (dimensions == 2))
   x = linspace (ms(1), Ms(1), plot_subdivisions);
   yy = linspace (ms(2), Ms(2), plot_subdivisions);
   [XX, YY] = meshgrid (x, yy);
-  surf (XX, YY, func (XX, YY));
+  ZZ = func (XX, YY);
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  surf (XX, YY, ZZ);
   axis auto;
   title ("Linear kernels");
   grid on;
   
   figure;
-  plot3 (X_nCores(:, 1), X_nCores(:, 2), y_nCores, "g+");
+  XX = X_nCores(:, 1);
+  YY = X_nCores(:, 2);
+  ZZ = y_nCores;
+  if (scalePlots)
+    XX = mu_X_nCores(1) + XX * sigma_X_nCores(1);
+    YY = mu_X_nCores(2) + YY * sigma_X_nCores(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "gx");
   hold on;
-  plot3 (big_X_nCores(:, 1), big_X_nCores(:, 2), big_y_nCores, "bd");
-  plot3 (Xcv_nCores(:, 1), Xcv_nCores(:, 2), ycv_nCores, "rx");
+  XX = big_X_nCores(:, 1);
+  YY = big_X_nCores(:, 2);
+  ZZ = big_y_nCores;
+  if (scalePlots)
+    XX = mu_X_nCores(1) + XX * sigma_X_nCores(1);
+    YY = mu_X_nCores(2) + YY * sigma_X_nCores(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "bd");
+  XX = Xcv_nCores(:, 1);
+  YY = Xcv_nCores(:, 2);
+  ZZ = ycv_nCores;
+  if (scalePlots)
+    XX = mu_X_nCores(1) + XX * sigma_X_nCores(1);
+    YY = mu_X_nCores(2) + YY * sigma_X_nCores(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "rx");
   w = SVs{2}' * coefficients{2};
   func = @(x, y) w(1) .* x + w(2) .* y + b{2};
   Ms = max ([X_nCores; big_X_nCores]);
@@ -167,16 +228,46 @@ if (printPlots && (dimensions == 2))
   x = linspace (ms(1), Ms(1), plot_subdivisions);
   yy = linspace (ms(2), Ms(2), plot_subdivisions);
   [XX, YY] = meshgrid (x, yy);
-  surf (XX, YY, func (XX, YY));
+  ZZ = func (XX, YY);
+  if (scalePlots)
+    XX = mu_X_nCores(1) + XX * sigma_X_nCores(1);
+    YY = mu_X_nCores(2) + YY * sigma_X_nCores(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  surf (XX, YY, ZZ);
   axis auto;
   title ('Linear kernels, nCores^{- 1}');
   grid on;
   
   figure;
-  plot3 (X(:, 1), X(:, 2), y, "g+");
+  XX = X(:, 1);
+  YY = X(:, 2);
+  ZZ = y;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "gx");
   hold on;
-  plot3 (big_X(:, 1), big_X(:, 2), big_y, "bd");
-  plot3 (Xcv(:, 1), Xcv(:, 2), ycv, "rx");
+  XX = big_X(:, 1);
+  YY = big_X(:, 2);
+  ZZ = big_y;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "bd");
+  XX = Xcv(:, 1);
+  YY = Xcv(:, 2);
+  ZZ = ycv;
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
+  plot3 (XX, YY, ZZ, "rx");
   Ms = max ([X; big_X]);
   ms = min ([X; big_X]);
   x = linspace (ms(1), Ms(1), plot_subdivisions);
@@ -190,6 +281,11 @@ if (printPlots && (dimensions == 2))
       ZZ(r, c) = coefficients{4}' * exp (sumsq (bsxfun (@minus, SVs{4}, point), 2) / 2);
     endfor
   endfor
+  if (scalePlots)
+    XX = mu_X(1) + XX * sigma_X(1);
+    YY = mu_X(2) + YY * sigma_X(2);
+    ZZ = mu_y + ZZ * sigma_y;
+  endif
   surf (XX, YY, ZZ);
   axis auto;
   title ("RBF kernels");
