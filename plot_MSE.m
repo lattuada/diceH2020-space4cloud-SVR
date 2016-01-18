@@ -1,33 +1,31 @@
 ## -*- texinfo -*- 
-## @deftypefn {Function File} {@var{h} =} plot_RMSE (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C}, @var{epsilon})
+## @deftypefn {Function File} {@var{h} =} plot_MSE (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C}, @var{epsilon})
 ##
 ## Train an SVR model specified by @var{options} on the training set
-## @var{ytrain}, @var{Xtrain} and plot the root mean squared error obtained on the
+## @var{ytrain}, @var{Xtrain} and plot the mean squared error obtained on the
 ## test set @var{ytest}, @var{Xtest}.
 ## All the combinations of values in @var{C} and @var{epsilon} are considered.
 ## Return the handle @var{h} to the plot.
 ##
 ## @end deftypefn
 
-function h = plot_RMSE (ytrain, Xtrain, ytest, Xtest, options, C, epsilon)
+function h = plot_MSE (ytrain, Xtrain, ytest, Xtest, options, C, epsilon)
 
 [cc, ee] = meshgrid (C, epsilon);
-RMSE = zeros (size (cc));
+MSE = zeros (size (cc));
 raw_options = options;
 
 for (ii = 1:length (cc))
   options = [raw_options, " -q -c ", num2str(cc(ii)), " -p ", num2str(ee(ii))];
   model = svmtrain (ytrain, Xtrain, options);
   [~, accuracy, ~] = svmpredict (ytest, Xtest, model, "-q");
-  RMSE(ii) = sqrt (accuracy(2));
+  MSE(ii) = accuracy(2);
 endfor
 
-rel_RMSE = RMSE / mean ([ytrain; ytest]);
-
-h = surf (cc, ee, rel_RMSE);
+h = surf (cc, ee, MSE);
 xlabel ('C');
 ylabel ('\epsilon');
-zlabel ('Relative RMSE');
-title ('Relative RMSE at varying model parameters');
+zlabel ('MSE');
+title ('MSE at varying model parameters');
 
 endfunction
