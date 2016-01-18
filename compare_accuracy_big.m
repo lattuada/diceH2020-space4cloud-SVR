@@ -22,16 +22,17 @@ big_size = max (big_sample(:, end - 1));
 
 rand ("seed", 17);
 sample = sample(randperm (size (sample, 1)), :);
-sample_nCores = sample;
-sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
-
-big_sample_nCores = big_sample;
-big_sample_nCores(:, end) = 1 ./ big_sample_nCores(:, end);
 
 everything = [sample; big_sample];
 everything = clear_outliers (everything);
 idx_small = (everything(:, end - 1) < big_size);
 idx_big = (everything(:, end - 1) == big_size);
+sample = sample_nCores = everything(idx_small, :);
+sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
+big_sample = big_sample_nCores = everything(idx_big, :);
+big_sample_nCores(:, end) = 1 ./ big_sample_nCores(:, end);
+
+everything = [sample; big_sample];
 [everything, mu, sigma] = zscore (everything);
 y = everything(idx_small, 1);
 X = everything(idx_small, 2:end);
@@ -43,9 +44,6 @@ mu_X = mu(2:end);
 sigma_X = sigma(2:end);
 
 everything = [sample_nCores; big_sample_nCores];
-everything = clear_outliers (everything);
-idx_small = (everything(:, end - 1) < big_size);
-idx_big = (everything(:, end - 1) == big_size);
 [everything, mu, sigma] = zscore (everything);
 y_nCores = everything(idx_small, 1);
 X_nCores = everything(idx_small, 2:end);
