@@ -3,16 +3,16 @@ close all hidden
 clc
 
 %% Parameters
-query = "R1";
+query = "R1_trick";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
 
-test_frac = 0.6;
-train_frac = 0.2;
+train_frac = 0.6;
+test_frac = 0.2;
 
-printPlots = false;
+printPlots = true;
 plot_subdivisions = 20;
 
 %% Real stuff
@@ -23,34 +23,39 @@ dimensions = size (sample, 2) - 1;
 big_size = max (big_sample(:, end - 1));
 
 complete_sample = [sample; big_sample];
-complete_sample = complete_sample(randperm (size (complete_sample, 1)), :);
-complete_sample_nCores = complete_sample;
-complete_sample_nCores(:, end) = 1 ./ complete_sample_nCores(:, end);
+clean_sample = clear_outliers (complete_sample);
+clean_sample_nCores = clean_sample;
+clean_sample_nCores(:, end) = 1 ./ clean_sample_nCores(:, end);
+idx = randperm (size (clean_sample, 1));
 
-everything = clear_outliers (complete_sample);
-idx_small = (everything(:, end - 1) < big_size);
-idx_big = (everything(:, end - 1) == big_size);
-[everything, mu, sigma] = zscore (everything);
-y = everything(idx_small, 1);
-X = everything(idx_small, 2:end);
-big_y = everything(idx_big, 1);
-big_X = everything(idx_big, 2:end);
+shuffled = clean_sample(idx, :);
+idx_small = (shuffled(:, end - 1) < big_size);
+idx_big = (shuffled(:, end - 1) == big_size);
+[scaled, mu, sigma] = zscore (shuffled);
+y = scaled(idx_small, 1);
+X = scaled(idx_small, 2:end);
+big_y = scaled(idx_big, 1);
+big_X = scaled(idx_big, 2:end);
+all_y = scaled(:, 1);
+all_X = scaled(:, 2:end);
 mu_y = mu(1);
 sigma_y = sigma(1);
 
-everything = clear_outliers (complete_sample_nCores);
-idx_small = (everything(:, end - 1) < big_size);
-idx_big = (everything(:, end - 1) == big_size);
-everything = zscore (everything);
-y_nCores = everything(idx_small, 1);
-X_nCores = everything(idx_small, 2:end);
-big_y_nCores = everything(idx_big, 1);
-big_X_nCores = everything(idx_big, 2:end);
+shuffled_nCores = clean_sample_nCores(idx, :);
+idx_small = (shuffled_nCores(:, end - 1) < big_size);
+idx_big = (shuffled_nCores(:, end - 1) == big_size);
+scaled_nCores = zscore (shuffled_nCores);
+y_nCores = scaled_nCores(idx_small, 1);
+X_nCores = scaled_nCores(idx_small, 2:end);
+big_y_nCores = scaled_nCores(idx_big, 1);
+big_X_nCores = scaled_nCores(idx_big, 2:end);
+all_y_nCores = scaled_nCores(:, 1);
+all_X_nCores = scaled_nCores(:, 2:end);
 
-[ytr, ytst, ycv] = split_sample ([y; big_y], train_frac, test_frac);
-[Xtr, Xtst, Xcv] = split_sample ([X; big_X], train_frac, test_frac);
-[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample ([y_nCores; big_y_nCores], train_frac, test_frac);
-[Xtr_nCores, Xtst_nCores, Xcv_nCores] = split_sample ([X_nCores; big_X_nCores], train_frac, test_frac);
+[ytr, ytst, ycv] = split_sample (all_y, train_frac, test_frac);
+[Xtr, Xtst, Xcv] = split_sample (all_X, train_frac, test_frac);
+[ytr_nCores, ytst_nCores, ycv_nCores] = split_sample (all_y_nCores, train_frac, test_frac);
+[Xtr_nCores, Xtst_nCores, Xcv_nCores] = split_sample (all_X_nCores, train_frac, test_frac);
 
 RMSEs = zeros (1, 4);
 Cs = zeros (1, 4);
