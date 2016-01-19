@@ -5,7 +5,7 @@ clc
 %% Parameters
 query = "R1_one_col";
 dataSize = "250";
-base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
+base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 train_frac = 0.6;
 test_frac = 0.2;

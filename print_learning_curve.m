@@ -4,7 +4,7 @@ clc
 
 %% Parameters
 query = "R1_two_cols";
-base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
+base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 seeds = 1:17;
 

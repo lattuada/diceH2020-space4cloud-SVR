@@ -4,7 +4,7 @@ clc
 
 %% Parameters
 query = "R3_two_cols";
-base_dir = "/home/eugenio/Desktop/cineca-runs-20150111/";
+base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
