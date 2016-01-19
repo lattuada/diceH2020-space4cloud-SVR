@@ -3,8 +3,8 @@ close all hidden
 clc
 
 %% Parameters
-query = "R1_one_col";
-dataSize = "250";
+query = "R3_one_col";
+dataSize = "500";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 train_frac = 0.6;
@@ -26,7 +26,7 @@ sample = [];
 cores = unique (sort (sample_before(:, end)))';
 for (cr = cores)
   idx = (sample_before(:, end) == cr);
-  loc = clear_outliers (sample_before(idx, :));
+  [loc, ~] = clear_outliers (sample_before(idx, :));
   sample = [sample; loc];
 endfor
 
