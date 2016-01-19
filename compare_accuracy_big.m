@@ -3,7 +3,7 @@ close all hidden
 clc
 
 %% Parameters
-query = "R3_two_cols";
+query = "unknown/noMax";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 C_range = linspace (0.1, 5, 20);
@@ -17,16 +17,17 @@ plot_subdivisions = 20;
 sample = read_from_directory ([base_dir, query, "/small"]);
 big_sample = read_from_directory ([base_dir, query, "/big"]);
 
-dimensions = size (sample, 2) - 1;
-big_size = max (big_sample(:, end - 1));
+dims = size (sample);
+dimensions = dims(2) - 1;
+small_size = dims(1);
 
 rand ("seed", 17);
 sample = sample(randperm (size (sample, 1)), :);
 
 everything = [sample; big_sample];
-everything = clear_outliers (everything);
-idx_small = (everything(:, end - 1) < big_size);
-idx_big = (everything(:, end - 1) == big_size);
+[everything, indices] = clear_outliers (everything);
+idx_small = (indices <= small_size);
+idx_big = (indices > small_size);
 sample = sample_nCores = everything(idx_small, :);
 sample_nCores(:, end) = 1 ./ sample_nCores(:, end);
 big_sample = big_sample_nCores = everything(idx_big, :);

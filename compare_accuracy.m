@@ -20,40 +20,41 @@ plot_subdivisions = 20;
 sample = read_from_directory ([base_dir, query, "/small"]);
 big_sample = read_from_directory ([base_dir, query, "/big"]);
 
-dimensions = size (sample, 2) - 1;
-big_size = max (big_sample(:, end - 1));
+dims = size (sample);
+dimensions = dims(2) - 1;
+small_size = dims(1);
 
 complete_sample = [sample; big_sample];
-clean_sample = clear_outliers (complete_sample);
+[clean_sample, indices] = clear_outliers (complete_sample);
 clean_sample_nCores = clean_sample;
 clean_sample_nCores(:, end) = 1 ./ clean_sample_nCores(:, end);
+idx_small = (indices <= small_size);
+idx_big = (indices > small_size);
 
 rand ("seed", 17);
-idx = randperm (size (clean_sample, 1));
+permutation = randperm (size (clean_sample, 1));
 
-shuffled = clean_sample(idx, :);
-idx_small = (shuffled(:, end - 1) < big_size);
-idx_big = (shuffled(:, end - 1) == big_size);
-[scaled, mu, sigma] = zscore (shuffled);
+[scaled, mu, sigma] = zscore (clean_sample);
+shuffled = scaled(permutation, :);
 y = scaled(idx_small, 1);
 X = scaled(idx_small, 2:end);
 big_y = scaled(idx_big, 1);
 big_X = scaled(idx_big, 2:end);
-all_y = scaled(:, 1);
-all_X = scaled(:, 2:end);
+all_y = shuffled(:, 1);
+all_X = shuffled(:, 2:end);
 mu_y = mu(1);
 sigma_y = sigma(1);
 mu_X = mu(2:end);
 sigma_X = sigma(2:end);
 
-shuffled_nCores = clean_sample_nCores(idx, :);
-[scaled_nCores, mu, sigma] = zscore (shuffled_nCores);
+[scaled_nCores, mu, sigma] = zscore (clean_sample_nCores);
+shuffled_nCores = scaled_nCores(permutation, :);
 y_nCores = scaled_nCores(idx_small, 1);
 X_nCores = scaled_nCores(idx_small, 2:end);
 big_y_nCores = scaled_nCores(idx_big, 1);
 big_X_nCores = scaled_nCores(idx_big, 2:end);
-all_y_nCores = scaled_nCores(:, 1);
-all_X_nCores = scaled_nCores(:, 2:end);
+all_y_nCores = shuffled_nCores(:, 1);
+all_X_nCores = shuffled_nCores(:, 2:end);
 mu_X_nCores = mu(2:end);
 sigma_X_nCores = sigma(2:end);
 
