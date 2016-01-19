@@ -1,15 +1,16 @@
 ## -*- texinfo -*- 
-## @deftypefn {Function File} {@var{h} =} learning_curves (@var{ytrain}, @var{Xtrain}, @var{ycv}, @var{Xcv}, @var{options})
+## @deftypefn {Function File} {[@var{m}, @var{MSE_train}, @var{MSE_cv}] =} learning_curves (@var{ytrain}, @var{Xtrain}, @var{ycv}, @var{Xcv}, @var{options})
 ##
 ## Train an SVR model specified by @var{options} on the training set
-## @var{ytrain}, @var{Xtrain} at varying dataset size
-## and plot the learning curves considering the
-## cross validation set @var{ycv}, @var{Xcv}.
-## Return the handle @var{h} to the plot.
+## @var{ytrain}, @var{Xtrain} at varying dataset size.
+## Return the arrays of sample sizes @var{m} and mean squared errors,
+## both on the training set @var{MSE_train} and on the cross validation
+## set @var{MSE_cv}.
 ##
+## @seealso {plot_learning_curves}
 ## @end deftypefn
 
-function h = learning_curves (ytrain, Xtrain, ycv, Xcv, options)
+function [m, MSE_train, MSE_cv] = learning_curves (ytrain, Xtrain, ycv, Xcv, options)
 
 m_train = length (ytrain);
 m_cv = length (ycv);
@@ -28,16 +29,5 @@ for (ii = 1:length (m))
   [~, accuracy, ~] = svmpredict (ycv, Xcv, model, "-q");
   MSE_cv(ii) = accuracy(2);
 endfor
-
-h = figure;
-plot (m, MSE_train, "b-", "linewidth", 2);
-hold on;
-plot (m, MSE_cv, "r-", "linewidth", 2);
-legend ("Training set", "Cross validation set");
-xlabel ('m');
-ylabel ('MSE');
-title ('Learning curve at varying training set size');
-grid on;
-hold off;
 
 endfunction

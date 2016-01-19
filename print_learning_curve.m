@@ -30,4 +30,5 @@ E_range = linspace (0.1, 5, 20);
 initial_options = "-s 3 -t 0 -q";
 [C, eps] = model_selection (ytr, Xtr, ytst, Xtst, initial_options, C_range, E_range);
 options = [initial_options, " -p ", num2str(eps), " -c ", num2str(C)];
-learning_curves (ytr, Xtr, ycv, Xcv, options);
+[m, MSEtrain, MSEcv] = learning_curves (ytr, Xtr, ycv, Xcv, options);
+plot_learning_curves (m, MSEtrain, MSEcv);
