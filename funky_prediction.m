@@ -6,8 +6,9 @@ clc
 query = "everything/noMax";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
-target = 6 * 60 * 1000; % Six minutes in milliseconds
+target = 15 * 60 * 1000; % Six minutes in milliseconds
 cluster = 40;
+nUsers = 5;
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
@@ -88,10 +89,12 @@ d250_idx = (datasets == 250);
 d500_idx = (datasets == 500);
 
 %% Plot-related stuff
-class1 = predictions(R1_idx & d250_idx);
-class2 = predictions(R2_idx & d250_idx);
+msec2min = 1 / (60 * 1000);
+class1 = predictions(R1_idx & d250_idx) * msec2min;
+class2 = predictions(R2_idx & d250_idx) * msec2min;
+target *= msec2min;
 
-h1 = h2 = t1 = t2 = cell (1, 2);
+h1 = h2 = t1 = t2 = cell (1, nUsers);
 for (r = 1:cluster - 1)
   s = cluster - r;
   for (users = 1:length (t1))
@@ -110,16 +113,17 @@ for (r = 1:cluster - 1)
   endfor
 endfor
 
-function auxplot (x, y, idx, opt)
-  plot (x{idx}, y{idx}, "linewidth", 2, opt);
+function auxplot (x, y, idx, opt, name)
+  dn = [name, " ", num2str(idx)];
+  plot (x{idx}, y{idx}, opt, "linewidth", 2, "DisplayName", dn);
 endfunction
 
-crossplot = @(idx) auxplot (h1, t1, idx, "x");
-plusplot = @(idx) auxplot (h2, t2, idx, "+");
+crossplot = @(idx) auxplot (h1, t1, idx, "x", "Class 1 - Users");
+ballplot = @(idx) auxplot (h2, t2, idx, "o", "Class 2 - Users");
 
 figure;
 hold all;
 arrayfun (crossplot, 1:length (t1));
-arrayfun (plusplot, 1:length (t2));
+arrayfun (ballplot, 1:length (t2));
 grid on;
-legend;
+legend location southwest;
