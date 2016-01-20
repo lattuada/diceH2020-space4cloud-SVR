@@ -3,10 +3,11 @@ close all hidden
 clc
 
 %% Parameters
-query = "everything/max";
+query = "everything/noMax";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
-target = 6 * 60 * 1000;
+target = 6 * 60 * 1000; % Six minutes in milliseconds
+cluster = 40;
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
@@ -14,10 +15,12 @@ E_range = linspace (0.1, 5, 20);
 train_frac = 0.8;
 
 %% Real work
-sample = read_from_directory ([base_dir, query, "/big"]);
+sample = read_from_directory ([base_dir, query]);
 
 features = read_from_directory ([base_dir, query, "/predict"]);
 labels = features(:, 1);
+datasets = mod (labels, 1e4);
+labels = floor (labels / 1e4);
 features = features(:, 2:end);
 features_nCores = features;
 features_nCores(:, end) = 1 ./ features_nCores(:, end);
@@ -73,3 +76,50 @@ scaled_predictions_nCores = svmpredict (labels, scaled_features_nCores, nlm, "-q
 safe_sigma_y = sigma_y + (sigma_y == 0);
 predictions = mu_y + scaled_predictions * sigma_y;
 predictions_nCores = mu_y + scaled_predictions_nCores * sigma_y;
+
+%% Obtain indices
+R1_idx = (labels == 1);
+R2_idx = (labels == 2);
+R3_idx = (labels == 3);
+R4_idx = (labels == 4);
+R5_idx = (labels == 5);
+
+d250_idx = (datasets == 250);
+d500_idx = (datasets == 500);
+
+%% Plot-related stuff
+class1 = predictions(R1_idx & d250_idx);
+class2 = predictions(R2_idx & d250_idx);
+
+h1 = h2 = t1 = t2 = cell (1, 2);
+for (r = 1:cluster - 1)
+  s = cluster - r;
+  for (users = 1:length (t1))
+    div = 2 ^ (users - 1);
+    time1 = class1(ceil (r / div));
+    time2 = class2(ceil (s / div));
+    found = false;
+    if (time1 <= target)
+      t1{users}(end+1) = time1;
+      h1{users}(end+1) = r;
+    endif
+    if (time2 <= target)
+      t2{users}(end+1) = time2;
+      h2{users}(end+1) = r;
+    endif
+  endfor
+endfor
+
+function auxplot (x, y, idx, opt)
+  plot (x{idx}, y{idx}, "linewidth", 2, opt);
+endfunction
+
+crossplot = @(idx) auxplot (h1, t1, idx, "x");
+plusplot = @(idx) auxplot (h2, t2, idx, "+");
+
+figure;
+hold all;
+arrayfun (crossplot, 1:length (t1));
+arrayfun (plusplot, 1:length (t2));
+grid on;
+legend;
