@@ -6,9 +6,9 @@ clc
 query = "everything/noMax";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
-target = 15 * 60 * 1000; % Six minutes in milliseconds
+target = 10 * 60 * 1000; % In milliseconds
 cluster = 40;
-nUsers = 5;
+nUsers = 3;
 
 C_range = linspace (0.1, 5, 20);
 E_range = linspace (0.1, 5, 20);
@@ -90,14 +90,15 @@ d500_idx = (datasets == 500);
 
 %% Plot-related stuff
 msec2min = 1 / (60 * 1000);
-class1 = predictions(R1_idx & d250_idx) * msec2min;
-class2 = predictions(R2_idx & d250_idx) * msec2min;
 target *= msec2min;
+
+class1 = predictions(R1_idx & d250_idx) * msec2min;
+class2 = predictions(R4_idx & d250_idx) * msec2min;
 
 h1 = h2 = t1 = t2 = cell (1, nUsers);
 for (r = 1:cluster - 1)
   s = cluster - r;
-  for (users = 1:length (t1))
+  for (users = 1:nUsers)
     div = 2 ^ (users - 1);
     time1 = class1(ceil (r / div));
     time2 = class2(ceil (s / div));
@@ -118,8 +119,8 @@ function auxplot (x, y, idx, opt, name)
   plot (x{idx}, y{idx}, opt, "linewidth", 2, "DisplayName", dn);
 endfunction
 
-crossplot = @(idx) auxplot (h1, t1, idx, "x", "Class 1 - Users");
-ballplot = @(idx) auxplot (h2, t2, idx, "o", "Class 2 - Users");
+crossplot = @(idx) auxplot (h1, t1, idx, "x", "R1 - Users");
+ballplot = @(idx) auxplot (h2, t2, idx, "o", "R4 - Users");
 
 figure;
 hold all;
