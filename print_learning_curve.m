@@ -3,7 +3,7 @@ close all hidden
 clc
 
 %% Parameters
-query = "R1_two_cols";
+query = "unknown/max";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 seeds = 1:17;
@@ -19,11 +19,17 @@ initial_options = "-s 3 -t 0 -q";
 %% Work
 sample = read_from_directory ([base_dir, query, "/small"]);
 sample_big = read_from_directory ([base_dir, query, "/big"]);
+
+small_size = size (sample, 1);
 complete_sample = [sample; sample_big];
+small_idx = (1:size (complete_sample, 1) <= small_size);
 scaled = zscore (complete_sample);
 
+small_scaled = scaled(small_idx, :);
+big_scaled = scaled(!small_idx, :);
+
 rand ("seed", seeds(1));
-shuffled = scaled(randperm (size (scaled, 1)), :);
+shuffled = scaled(randperm (size (small_scaled, 1)), :);
 [train, test, ~] = split_sample (shuffled, train_frac, test_frac);
 ytr = train(:, 1);
 Xtr = train(:, 2:end);
@@ -37,12 +43,13 @@ seeds = seeds(:)';
 m = MSEtrain = MSEcv = [];
 for (seed = seeds)
   rand ("seed", seed);
-  shuffled = scaled(randperm (size (scaled, 1)), :);
-  [train, ~, cv] = split_sample (shuffled, train_frac, test_frac);
+  idx = randperm (size (small_scaled, 1));
+  shuffled = small_scaled(idx, :);
+  [train, ~, ~] = split_sample (shuffled, train_frac, test_frac);
   ytr = train(:, 1);
   Xtr = train(:, 2:end);
-  ycv = cv(:, 1);
-  Xcv = cv(:, 2:end);
+  ycv = big_scaled(:, 1);
+  Xcv = big_scaled(:, 2:end);
   
   [current_m, current_MSEtrain, current_MSEcv] = learning_curves (ytr, Xtr, ycv, Xcv, options);
   m = [m; current_m];
