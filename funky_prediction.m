@@ -7,6 +7,7 @@ query = "everything/noMax";
 base_dir = "/home/eugenio/Desktop/cineca-runs-20160116/";
 
 target = 10 * 60 * 1000; % In milliseconds
+plot_minutes = false;
 cluster = 40;
 nUsers = 3;
 
@@ -89,7 +90,10 @@ d250_idx = (datasets == 250);
 d500_idx = (datasets == 500);
 
 %% Plot-related stuff
-msec2min = 1 / (60 * 1000);
+msec2min = 1;
+if (plot_minutes)
+  msec2min = 1 / (60 * 1000);
+endif
 target *= msec2min;
 
 class1 = predictions(R1_idx & d250_idx) * msec2min;
