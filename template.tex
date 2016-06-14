@@ -1,0 +1,30 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage[labelfont=bf]{caption}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{array}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
+\author{J.~Smith}
+\title{Your Title Here}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{latex_output/test_id.tex}
+\input{latex_output/test_id2.tex}
+
+\end{document}
