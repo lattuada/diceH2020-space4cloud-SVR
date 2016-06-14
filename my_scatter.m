@@ -1,4 +1,4 @@
-## Copyright 2016 Eugenio Gianniti
+## Copyright 2016 Andrea Battistello
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -12,21 +12,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
-## @deftypefn {Function File} {@var{sample} =} read_data (@var{filename})
-##
-## Read data from the input CSV file named @var{filename} and return its
-## content in @var{sample}.
-##
-## @seealso{read_from_directory}
-## @end deftypefn
 
-function sample = read_data (filename)
+function my_scatter(x, y, color='b', marker='o')
 
-if (! ischar (filename))
-  error ("read_data: FILENAME should be a string");
-endif
-
-sample = csvread (filename, 2, 0);
-
-endfunction
+	handle = plot(x, y);
+	set(handle, 'linestyle', 'none');
+	set(handle, 'marker', marker);
+	set(handle, 'color', color);
+end

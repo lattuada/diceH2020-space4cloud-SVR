@@ -23,13 +23,13 @@
 ## @seealso {learning_curves}
 ## @end deftypefn
 
-function h = plot_learning_curves (m, MSE_train, MSE_cv)
+function h = plot_learning_curves (m, MSE_train, MSE_cv, visible=true)
 
-h = figure;
+h = figure('Visible', visible);
 plot (m, MSE_train, "b-", "linewidth", 2);
 hold on;
 plot (m, MSE_cv, "r-", "linewidth", 2);
-legend ("Training set", "Cross validation set");
+legend ("Training set", "Test set");
 xlabel ('m');
 ylabel ('MSE');
 title ('Learning curve at varying training set size');
