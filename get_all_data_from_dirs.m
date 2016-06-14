@@ -12,11 +12,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+function train_data = get_all_data_from_dirs (base, queries)
 
-function train_data = get_all_data_from_dirs(base, queries)
-	train_data = [];
-	for q = queries
-		fprintf("\nDEBUG: loading %s", char(q));
-		train_data = [train_data; read_from_directory(strcat(char(base), char(q)))];
-	endfor
+train_data = [];
+for (q = queries)
+  fprintf ("\nDEBUG: loading %s", char(q));
+  train_data = [train_data; read_from_directory(strcat(char(base), char(q)))];
+endfor
+
 endfunction

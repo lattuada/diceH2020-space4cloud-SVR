@@ -12,11 +12,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+function my_scatter (x, y, color="b", marker="o")
 
-function my_scatter(x, y, color='b', marker='o')
+handle = plot (x, y);
+set (handle, "linestyle", "none");
+set (handle, "marker", marker);
+set (handle, "color", color);
 
-	handle = plot(x, y);
-	set(handle, 'linestyle', 'none');
-	set(handle, 'marker', marker);
-	set(handle, 'color', color);
-end
+endfunction

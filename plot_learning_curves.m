@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {@var{h} =} plot_learning_curves (@var{m}, @var{MSE_train}, @var{MSE_cv})
 ##
 ## Plot learning curves given sample sizes @var{m} and mean squared errors,
@@ -25,7 +25,7 @@
 
 function h = plot_learning_curves (m, MSE_train, MSE_cv, visible=true)
 
-h = figure('Visible', visible);
+h = figure ("Visible", visible);
 plot (m, MSE_train, "b-", "linewidth", 2);
 hold on;
 plot (m, MSE_cv, "r-", "linewidth", 2);
