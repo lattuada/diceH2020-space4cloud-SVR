@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {[@var{training}, @var{testing}, @var{cv}] =} split_sample (@var{sample}, @var{train}, @var{test})
 ##
 ## Split @var{sample} so that a fraction @var{train}, @var{test}

@@ -64,7 +64,7 @@ for (seed = seeds)
   Xtr = train(:, 2:end);
   ycv = big_scaled(:, 1);
   Xcv = big_scaled(:, 2:end);
-  
+
   [current_m, current_MSEtrain, current_MSEcv] = learning_curves (ytr, Xtr, ycv, Xcv, options);
   m = [m; current_m];
   MSEtrain = [MSEtrain; current_MSEtrain];

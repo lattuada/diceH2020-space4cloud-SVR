@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {@var{h} =} plot_MSE (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C}, @var{epsilon})
 ##
 ## Train an SVR model specified by @var{options} on the training set

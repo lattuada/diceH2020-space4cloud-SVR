@@ -193,7 +193,7 @@ if (printPlots)
   axis auto;
   title ("Linear kernels");
   grid on;
-  
+
   figure;
   abscissae = X_nCores;
   ordinates = y;
@@ -225,7 +225,7 @@ if (printPlots)
   axis auto;
   title ('Linear kernels, nCores^{- 1}');
   grid on;
-  
+
   figure;
   abscissae = X;
   ordinates = y;

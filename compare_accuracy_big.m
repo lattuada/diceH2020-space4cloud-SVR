@@ -197,7 +197,7 @@ if (printPlots && (dimensions == 2))
   axis auto;
   title ("Linear kernels");
   grid on;
-  
+
   figure;
   XX = X_nCores(:, 1);
   YY = X_nCores(:, 2);
@@ -235,7 +235,7 @@ if (printPlots && (dimensions == 2))
   axis auto;
   title ('Linear kernels, nCores^{- 1}');
   grid on;
-  
+
   figure;
   XX = X(:, 1);
   YY = X(:, 2);

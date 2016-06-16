@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {@var{h} =} plot_R (@var{y}, @var{X})
 ##
 ## Plot response time, @var{y}, against number of cores and dataset size found

@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {[@var{C}, @var{epsilon}] =} model_selection (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C_range}, @var{epsilon_range})
 ##
 ## Perform model selection on the training set @var{ytrain}, @var{Xtrain}

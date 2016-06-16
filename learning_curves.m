@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {[@var{m}, @var{MSE_train}, @var{MSE_cv}] =} learning_curves (@var{ytrain}, @var{Xtrain}, @var{ycv}, @var{Xcv}, @var{options})
 ##
 ## Train an SVR model specified by @var{options} on the training set

@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-## -*- texinfo -*- 
+## -*- texinfo -*-
 ## @deftypefn {Function File} {@var{sample} =} read_data (@var{directory})
 ##
 ## Read data from the input CSV files contained in @var{directory} and return
