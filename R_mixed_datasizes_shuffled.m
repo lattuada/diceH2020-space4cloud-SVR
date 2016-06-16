@@ -17,36 +17,35 @@ clc;
 close all hidden;
 warning('off', 'Octave:possible-matlab-short-circuit-operator');
 
-addpath('./utility/');
+OUTPUT_BASE_FOLDER = "/Users/eugenio/Desktop/capacity-session-data/results/";
 
 TEST_ID = 'aggregated_shuffled';
-OUTPUT_FOLDER = 'output/';
-LATEX_OUTPUT_FOLDER = 'latex_output/';
+OUTPUT_FOLDER = [OUTPUT_BASE_FOLDER, "output/"];
+LATEX_OUTPUT_FOLDER = [OUTPUT_BASE_FOLDER, "latex_output/"];
 
-SAVE_DATA = true;       % Plots and data
+SAVE_DATA = false;       % Plots and data
 ALL_THE_PLOTS = false;      % Plot every feature
-BEST_MODELS = true;       % Make additional plots with only the best 3 models
+BEST_MODELS = false;       % Make additional plots with only the best 3 models
 
 LEARNING_CURVES = false;
 
 OUTPUT_LATEX = true;      % Save results to a latex file
 LATEX_TABLE = true;       % Include tables with training and testing metrics
 LATEX_PLOT = false;       % Include regular plots
-LATEX_PLOT_BESTMODELS = true; % Include "best models" plots
+LATEX_PLOT_BESTMODELS = false; % Include "best models" plots
 SECTION_HEADER = 'Aggregated datasizes, shuffled, $ncores^{-1}$';   % Header for the latex document
 
-OUTPUT_FORMATS = {  {'-deps', '.eps'},          % generates only one .eps file black and white
-          {'-depslatex', '.eps'},       % generates one .eps file containing only the plot and a .tex file that includes the plot and fill the legend with plain text
-          {'-depsc', '.eps'},         % generates only one .eps file with colour
-          {'-dpdflatex', '.pdf'}        % generates one .pdf file containing only the plot and a .tex file that includes the plot and fill the legend with plain text
-          {'-dpdf', '.pdf'}         % generates one complete .pdf file A4
-        };
+OUTPUT_FORMATS = {{'-deps', '.eps'},      % generates only one .eps file black and white
+                  {'-depslatex', '.eps'}, % generates one .eps file containing only the plot and a .tex file that includes the plot and fill the legend with plain text
+                  {'-depsc', '.eps'},     % generates only one .eps file with colour
+                  {'-dpdflatex', '.pdf'}  % generates one .pdf file containing only the plot and a .tex file that includes the plot and fill the legend with plain text
+                  {'-dpdf', '.pdf'}};     % generates one complete .pdf file A4
+
 PLOT_SAVE_FORMAT = 3;
 
-BASE_DIR = './dati/Query R/';
+BASE_DIR = '/Users/eugenio/Desktop/capacity-session-data/';
 
-QUERIES = {'R1', 'R2', 'R3', 'R4', 'R5'};   % Queries to analyze
-% QUERIES = {'R1', 'R2'};
+QUERIES = {'R1', 'R2'};   % Queries to analyze
 
 %% Choose which SVR models to use
 % 1 -> Linear SVR
@@ -73,9 +72,9 @@ LINEAR_REGRESSION = true; % Add linear regression to the models used
 % 10 -> Bandwidth max
 % 11 -> N Users
 % 12 -> Datasize
-% 13 -> N Cores
+% 13 -> N containers
 CHOOSE_FEATURES = true;
-FEATURES = [1:10, 12, 13];
+FEATURES = 1:13;
 SPECIAL_FEATURES = false;   % nmap/ncores, nreduce/ncores
 
 N_CORES_INVERSE = true;   % To use ncores^(-1) instead of ncores
@@ -93,7 +92,7 @@ ALL_FEATURES_DESCRIPTIONS = {   % These will be used for the plot labels
   'Bandwidth max',
   'N Users',
   'Datasize',
-  'N cores'
+  'N containers'
 };
 
 %% Fractions of data reserved for training and testing (the remaining amount is used for cross-validation)
