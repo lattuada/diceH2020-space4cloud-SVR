@@ -17,20 +17,20 @@ clc;
 close all hidden;
 warning('off', 'Octave:possible-matlab-short-circuit-operator');
 
-OUTPUT_BASE_FOLDER = "/Users/eugenio/Desktop/capacity-session-data/results/";
+OUTPUT_BASE_FOLDER = "/home/eugenio/Desktop/dependencies_multi/R_results/";
 
 TEST_ID = 'aggregated_shuffled';
 OUTPUT_FOLDER = [OUTPUT_BASE_FOLDER, "output/"];
 LATEX_OUTPUT_FOLDER = [OUTPUT_BASE_FOLDER, "latex_output/"];
 
-SAVE_DATA = false;       % Plots and data
+SAVE_DATA = true;       % Plots and data
 ALL_THE_PLOTS = false;      % Plot every feature
 BEST_MODELS = false;       % Make additional plots with only the best 3 models
 
 LEARNING_CURVES = false;
 
-OUTPUT_LATEX = true;      % Save results to a latex file
-LATEX_TABLE = true;       % Include tables with training and testing metrics
+OUTPUT_LATEX = false;      % Save results to a latex file
+LATEX_TABLE = false;       % Include tables with training and testing metrics
 LATEX_PLOT = false;       % Include regular plots
 LATEX_PLOT_BESTMODELS = false; % Include "best models" plots
 SECTION_HEADER = 'Aggregated datasizes, shuffled, $ncores^{-1}$';   % Header for the latex document
@@ -43,9 +43,9 @@ OUTPUT_FORMATS = {{'-deps', '.eps'},      % generates only one .eps file black a
 
 PLOT_SAVE_FORMAT = 3;
 
-BASE_DIR = '/Users/eugenio/Desktop/capacity-session-data/';
+BASE_DIR = '/home/eugenio/Desktop/dependencies_multi/';
 
-QUERIES = {'R1', 'R2'};   % Queries to analyze
+QUERIES = {'R1', 'R2', "R3", "R4", "R5"};   % Queries to analyze
 
 %% Choose which SVR models to use
 % 1 -> Linear SVR
@@ -54,10 +54,10 @@ QUERIES = {'R1', 'R2'};   % Queries to analyze
 % 4 -> Polynomial SVR (4 degree)
 % 5 -> Polynomial SVR (6 degree)
 % 6 -> RBF SVR
-MODELS_CHOSEN = [1, 2, 3, 4, 5, 6];
+MODELS_CHOSEN = [1];
 COLORS = {'g', [1, 0.5, 0.2], 'c', 'k', 'm', 'r'};    % Magenta, orange, cyan, black, green, red
 
-LINEAR_REGRESSION = true; % Add linear regression to the models used
+LINEAR_REGRESSION = false; % Add linear regression to the models used
 
 %% Choose which features to use
 % 1 -> N map
@@ -102,7 +102,7 @@ TEST_FRAC_WO_TEST = 0.2;
 %% Not used
 TRAIN_FRAC_W_TEST = 0.7;
 
-DIFF_MEANS = false;     % To add the 'difference between means' metric
+DIFF_MEANS = true;     % To add the 'difference between means' metric
 
 NORMALIZE_FEATURE = true;       % Normalize all the features
 CLEAR_OUTLIERS = true;          % Clear all outliers outside of 2 standard deviations
@@ -110,7 +110,7 @@ ENABLE_FEATURE_FILTERING = true;    % Filter every datapoint with completion tim
 COMPLETION_TIME_THRESHOLD = 1500000;
 
 SHUFFLE_DATA = true;    % Used for cross-validation
-rand('seed', 18);
+rand('seed', 17);
 
 % Ranges of the parameters values for model selection
 C_range = linspace (0.1, 5, 20);
@@ -658,8 +658,9 @@ for query_id = 1:length(QUERIES)
     RMSE = sqrt(sum_residual / length(y_tr));   % Root Mean Squared Error
     R2 = 1 - (sum_residual / sum_total);      % R^2
 
-    fprintf(flatex_table, 'Linear regression & %5.4f & %5.4f & %6.0f & %5.4f \\\\\n', RMSE, R2, mean_abs, mean_rel);
-
+    if (OUTPUT_LATEX)
+      fprintf(flatex_table, 'Linear regression & %5.4f & %5.4f & %6.0f & %5.4f \\\\\n', RMSE, R2, mean_abs, mean_rel);
+    endif
   end
 
 
@@ -673,7 +674,9 @@ for query_id = 1:length(QUERIES)
     mean_abs = mean(abs_err);
     mean_rel = mean(rel_err);
 
-    fprintf(flatex_table, '%s & %5.4f & %5.4f & %6.0f & %5.4f \\\\\n', SVR_DESCRIPTIONS{index}, RMSEs_tr(index), R_2_tr(index), mean_abs, mean_rel);
+    if (OUTPUT_LATEX)
+      fprintf(flatex_table, '%s & %5.4f & %5.4f & %6.0f & %5.4f \\\\\n', SVR_DESCRIPTIONS{index}, RMSEs_tr(index), R_2_tr(index), mean_abs, mean_rel);
+    endif
   end
 
   if OUTPUT_LATEX
