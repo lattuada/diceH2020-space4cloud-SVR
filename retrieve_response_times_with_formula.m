@@ -18,11 +18,11 @@ clc
 
 configurations = [6];
 task_idx = [6 13 20 27];
-base_path = "/home/osboxes/Desktop/test/%d.csv";
+base_path = "/Users/gianniti/Desktop/Ehsan";
 
 operational_data = cell (size (configurations));
 for (idx = 1:numel (configurations))
-  filename = sprintf (base_path, configurations(idx));
+  filename = sprintf ([base_path, "/%d.csv"], configurations(idx));
   operational_data{idx} = read_data (filename);
 endfor
 
@@ -43,5 +43,5 @@ endfor
 plot (configurations, predictions, '-');
 
 results = [configurations(:), predictions(:)];
-filename = "/home/osboxes/Desktop/test/estimated_response_times.csv";
+filename = [base_path, "/estimated_response_times.csv"];
 csvwrite (filename, results);
