@@ -16,9 +16,12 @@ clear all
 close all hidden
 clc
 
-configurations = [6];
-task_idx = [6 13 20 27];
-base_path = "/Users/gianniti/Desktop/Ehsan";
+configurations = [6 8 10];
+base_path = "/Users/gianniti/Desktop/Ehsan/40";
+
+%% Example to retrieve task_idx:
+%    head -n 2 10.csv| tail -n 1 | tr , '\n' | grep -n nTask | cut -d : -f 1 | xargs echo
+task_idx = [5 10 15 22];
 
 operational_data = cell (size (configurations));
 for (idx = 1:numel (configurations))
@@ -42,6 +45,6 @@ endfor
 
 plot (configurations, predictions, '-');
 
-results = [configurations(:), predictions(:)];
+results = [predictions(:), configurations(:)];
 filename = [base_path, "/estimated_response_times.csv"];
 csvwrite (filename, results);
