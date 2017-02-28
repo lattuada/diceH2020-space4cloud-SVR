@@ -1,4 +1,4 @@
-## Copyright 2016 Eugenio Gianniti
+## Copyright 2017 Eugenio Gianniti
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -13,18 +13,19 @@
 ## limitations under the License.
 
 ## -*- texinfo -*-
-## @deftypefn {Function File} {[@var{C}, @var{epsilon}] =} model_selection (@var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C_range}, @var{epsilon_range})
+## @deftypefn {Function File} {[@var{C}, @var{epsilon}] =} model_selection_weights (@var{Wtrain}, @var{ytrain}, @var{Xtrain}, @var{ytest}, @var{Xtest}, @var{options}, @var{C_range}, @var{epsilon_range})
 ##
 ## Perform model selection on the training set @var{ytrain}, @var{Xtrain}
+## with weights @var{Wtrain},
 ## according to the performance on the test set @var{ytest], @var{Xtest}.
 ## The general model is defined via @var{options} and the grid search spans
 ## @var{C_range} and @var{epsilon_range}.
 ## In the end, return the optimal @var{C} and @var{epsilon}.
 ##
-## @seealso{model_selection_weights}
+## @seealso{model_selection}
 ## @end deftypefn
 
-function [C, epsilon] = model_selection (ytrain, Xtrain, ytest, Xtest, options, C_range, epsilon_range)
+function [C, epsilon] = model_selection_weights (Wtrain, ytrain, Xtrain, ytest, Xtest, options, C_range, epsilon_range)
 
 raw_options = options;
 C_range = C_range(:)';
@@ -36,7 +37,7 @@ MSE = Inf;
 for (cc = C_range)
   for (ee = epsilon_range)
     options = [raw_options, " -p ", num2str(ee), " -c ", num2str(cc)];
-    model = svmtrain (ytrain, Xtrain, options);
+    model = svmtrain (Wtrain, ytrain, Xtrain, options);
     [~, accuracy, ~] = svmpredict (ytest, Xtest, model, "-q");
     mse = accuracy(2);
     if (mse < MSE)
