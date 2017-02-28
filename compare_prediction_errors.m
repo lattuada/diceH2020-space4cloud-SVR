@@ -42,13 +42,13 @@ experimental_weight = 5;
 
 [~, err, ~] = stat (hybrid_csv);
 if (err == 0)
-  error (sprintf ("compare_prediction_errors: '%s' exists, it cannot b overwritten",
+  error (sprintf ("compare_prediction_errors: '%s' exists, it cannot be overwritten",
                   hybrid_csv));
 endif
 
 [~, err, ~] = stat (ml_csv);
 if (err == 0)
-  error (sprintf ("compare_prediction_errors: '%s' exists, it cannot b overwritten",
+  error (sprintf ("compare_prediction_errors: '%s' exists, it cannot be overwritten",
                   ml_csv));
 endif
 
@@ -126,8 +126,8 @@ for (outer = outer_thresholds)
           endif
           
           counter += 1;
-        until (counter >= max_inner_iterations &&
-               best_train_error < inner && best_cv_error < inner);
+        until (counter >= max_inner_iterations ||
+               (best_train_error < inner && best_cv_error < inner));
         
         if (counter == max_inner_iterations)
           too_many_inner_iterations = true;
@@ -145,15 +145,16 @@ for (outer = outer_thresholds)
       
       too_many_outer_iterations = (it == iterations);
       
-      row = [outer, inner, seed, it, overall_counter, too_many_inner_iterations,
-             too_many_outer_iterations, best_train_error, best_test_error,
-             best_cv_error, best_available_error, best_missing_error];
+      row = [outer, inner, seed, it, overall_counter, ...
+             too_many_inner_iterations, too_many_outer_iterations, ...
+             best_train_error, best_test_error, best_cv_error, ...
+             best_available_error, best_missing_error];
       csvwrite (hybrid_csv, row, "-append");
       
-      ml_row = [outer, inner, seed, it, overall_counter,
-                too_many_inner_iterations,
-                too_many_outer_iterations, ml_results.train_error,
-                ml_results.test_error, ml_results.cv_error,
+      ml_row = [outer, inner, seed, it, overall_counter, ...
+                too_many_inner_iterations, too_many_outer_iterations, ...
+                ml_results.train_error, ml_results.test_error, ...
+                ml_results.cv_error, ...
                 ml_results.available_error, ml_results.missing_error];
       csvwrite (ml_csv, ml_row, "-append");
     endfor
