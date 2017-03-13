@@ -17,7 +17,7 @@ close all hidden
 clc
 
 configurations = [6 8 10];
-base_path = "/Users/gianniti/Desktop/Ehsan/40";
+base_path = "/Users/eugenio/Desktop/test_code/dataset";
 
 %% Example to retrieve task_idx:
 %    head -n 2 10.csv| tail -n 1 | tr , '\n' | grep -n nTask | cut -d : -f 1 | xargs echo

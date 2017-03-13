@@ -16,9 +16,9 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/gianniti/Desktop/Ehsan/40";
-hybrid_csv = "/Users/gianniti/Desktop/Ehsan/40/hybrid.csv";
-ml_csv = "/Users/gianniti/Desktop/Ehsan/40/ml.csv";
+base_directory = "/Users/eugenio/Desktop/test_code/dataset";
+hybrid_csv = "/Users/eugenio/Desktop/test_code/hybrid.csv";
+ml_csv = "/Users/eugenio/Desktop/test_code/ml.csv";
 
 configuration.runs = [6 8 10];
 configuration.missing_runs = 10;
@@ -27,12 +27,12 @@ configuration.train_fraction = 0.6;
 configuration.test_fraction = 0.2;
 
 configuration.options = "-s 3 -t 0 -q -h 0 ";
-configuration.C_range = linspace (0.1, 5, 3);
-configuration.epsilon_range = linspace (0.1, 5, 3);
+configuration.C_range = linspace (0.1, 5, 20);
+configuration.epsilon_range = linspace (0.1, 5, 20);
 
 outer_thresholds = 34;
 inner_thresholds = 23;
-max_inner_iterations = 2;
+max_inner_iterations = 10;
 seeds = 17;
 
 analytical_weight = 1;
@@ -62,7 +62,7 @@ endfor
 
 clean_experimental_data = cellfun (@(A) nthargout (1, @clear_outliers, A),
                                    experimental_data, "UniformOutput", false);
-clean_experimental_data = cellfun (@(A) [A(:, 1), 1 ./ A(:, end)],
+clean_experimental_data = cellfun (@(A) [A(:, 1), A(:, end)],
                                    clean_experimental_data,
                                    "UniformOutput", false);
 
@@ -90,6 +90,7 @@ for (outer = outer_thresholds)
       for (ii = 1:numel (clean_experimental_data))
         idx = randperm (rows (clean_experimental_data{ii}));
         experimental_shuffled{ii} = clean_experimental_data{ii}(idx, :);
+        experimental_shuffled{ii}(:, end) = 1 ./ experimental_shuffled{ii}(:, end);
       endfor
 
       overall_counter = 0;
@@ -100,7 +101,7 @@ for (outer = outer_thresholds)
       iterations = min (cellfun (@rows, experimental_shuffled));
       it = 0;
       while (it < iterations &&
-             best_train_error > outer && best_cv_error > outer)
+             (best_train_error > outer || best_cv_error > outer))
         it += 1;
         
         % Update the knowledge base with new data
@@ -125,12 +126,25 @@ for (outer = outer_thresholds)
             best_options = results.options;
           endif
           
+          current_train_error = results.train_error;
+          current_cv_error = results.cv_error;
+          
           counter += 1;
         until (counter >= max_inner_iterations ||
-               (best_train_error < inner && best_cv_error < inner));
+               (current_train_error < inner && current_cv_error < inner));
         
         if (counter == max_inner_iterations)
           too_many_inner_iterations = true;
+        else
+          % The idea seems to be that if you can exit from the loop before
+          % exhausting your iterations then the best result is the one
+          % that allowed to do so.
+          best_train_error = results.train_error;
+          best_test_error = results.test_error;
+          best_cv_error = results.cv_error;
+          best_available_error = results.available_error;
+          best_missing_error = results.missing_error;
+          best_options = results.options;
         endif
         
         overall_counter += counter;
