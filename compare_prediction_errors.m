@@ -62,12 +62,15 @@ endfor
 
 clean_experimental_data = cellfun (@(A) nthargout (1, @clear_outliers, A),
                                    experimental_data, "UniformOutput", false);
-clean_experimental_data = cellfun (@(A) [A(:, 1), A(:, end)],
+clean_experimental_data = cellfun (@(A) [A(:, 1), 1 ./ A(:, end)],
                                    clean_experimental_data,
                                    "UniformOutput", false);
 
 avg_execution_times = ...
   cellfun (@(A) mean (A(:, 1)), clean_experimental_data);
+
+analytical_sample = analytical_data;
+analytical_sample(:, end) = 1 ./ analytical_sample(:, end);
 
 [available_idx, missing_idx] = find_configurations (configuration.runs,
                                                     configuration.missing_runs);
@@ -76,9 +79,6 @@ for (outer = outer_thresholds)
   for (inner = inner_thresholds)
     for (seed = seeds)
       rand ("seed", seed);
-      
-      analytical_sample = analytical_data;
-      analytical_sample(:, end) = 1 ./ analytical_sample(:, end);
       
       knowledge_base = analytical_sample;
       weights = analytical_weight * ones (rows (analytical_sample), 1);

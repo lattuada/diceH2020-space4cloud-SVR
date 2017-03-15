@@ -22,6 +22,8 @@
 
 function [available, missing] = find_configurations (runs, missing_runs)
 
+available = missing = [];
+
 for (ii = 1:numel(runs))
   if (any (missing_runs == runs(ii)))
     missing(end + 1) = ii;
