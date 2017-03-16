@@ -123,6 +123,7 @@ for (outer = outer_thresholds)
             best_available_error = results.available_error;
             best_missing_error = results.missing_error;
             best_options = results.options;
+            best_model = results.model;
           endif
           
           current_train_error = results.train_error;
@@ -144,6 +145,7 @@ for (outer = outer_thresholds)
           best_available_error = results.available_error;
           best_missing_error = results.missing_error;
           best_options = results.options;
+          best_model = results.model;
         endif
         
         overall_counter += counter;

@@ -103,6 +103,7 @@ results.C = C;
 results.epsilon = eps;
 
 model = svmtrain (Wtr, ytr, Xtr, results.options);
+results.model = model;
 [predictions, ~, ~] = svmpredict (zeros (size (scaled_cores)), scaled_cores,
                                   model, "-q");
 rescaled_predictions = rescale (predictions, mu_y, sigma_y);
