@@ -25,8 +25,17 @@ configuration.train_fraction = 0.6;
 configuration.test_fraction = 0.2;
 
 configuration.options = "-s 3 -t 0 -q -h 0 ";
-configuration.C_range = linspace (0.1, 5, 20);
-configuration.epsilon_range = linspace (0.1, 5, 20);
+configuration.C_range = linspace (1e-4, 1, 20);
+configuration.epsilon_range = linspace (1e-8, 1, 20);
+
+%% End of configuration
+
+outfilename = [base_directory, "/model.txt"];
+[~, err, ~] = stat (outfilename);
+if (err == 0)
+  error (sprintf ("learn_spark_model: '%s' exists, it cannot be overwritten",
+                  outfilename));
+endif
 
 experimental_data = cell (size (configuration.runs));
 for (ii = 1:numel (configuration.runs))
@@ -45,12 +54,12 @@ sample(:, end) = 1 ./ sample(:, end);
 idx = randperm (rows (sample));
 shuffled = sample(idx, :);
 
-[scaled, mu, sigma] = zscore (shuffled);
+[~, mu, sigma] = zscore (shuffled);
 
 constant_columns = find (sigma == 0);
-cols = 1:columns (scaled);
+cols = 1:columns (shuffled);
 useful_columns = setdiff (cols, constant_columns);
-working_sample = scaled(:, useful_columns);
+working_sample = shuffled(:, useful_columns);
 working_mu = mu(useful_columns);
 working_sigma = sigma(useful_columns);
 
@@ -59,15 +68,21 @@ weights = ones (rows (working_sample), 1);
 results = model_selection_with_thresholds (working_sample, weights, avg_times,
                                            configuration);
 
-y = working_sample(:, 1);
-X = working_sample(:, 2:end);
-model = svmtrain (weights, y, X, results.options);
-
+model = results.model;
 b = - model.rho;
 w = model.SVs' * model.sv_coef;
 useful_columns = useful_columns(:);
 working_mu = working_mu(:);
 working_sigma = working_sigma(:);
 
-outfilename = [base_directory, "/model.txt"];
-save (outfilename, "b", "w", "useful_columns", "working_mu", "working_sigma");
+C = results.C;
+epsilon = results.epsilon;
+train_error = results.train_error;
+test_error = results.test_error;
+cv_error = results.cv_error;
+available_error = results.available_error;
+missing_error = results.missing_error;
+
+save (outfilename, "b", "w", "useful_columns", "working_mu", "working_sigma",
+      "C", "epsilon", "train_error", "test_error", "cv_error",
+      "available_error", "missing_error");
