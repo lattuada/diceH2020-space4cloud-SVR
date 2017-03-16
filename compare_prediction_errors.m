@@ -16,12 +16,12 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/test_code/dataset";
-hybrid_csv = "/Users/eugenio/Desktop/test_code/hybrid.csv";
-ml_csv = "/Users/eugenio/Desktop/test_code/ml.csv";
+base_directory = "/Users/eugenio/Desktop/Q26-per-ml";
+hybrid_csv = "/Users/eugenio/Desktop/Q26-per-ml/hybrid.csv";
+ml_csv = "/Users/eugenio/Desktop/Q26-per-ml/ml.csv";
 
-configuration.runs = [6 8 10];
-configuration.missing_runs = 10;
+configuration.runs = [20 30 40 48 60 72 80 90 100 108 120];
+configuration.missing_runs = 120;
 
 configuration.train_fraction = 0.6;
 configuration.test_fraction = 0.2;
@@ -30,10 +30,10 @@ configuration.options = "-s 3 -t 0 -q -h 0 ";
 configuration.C_range = linspace (0.1, 5, 20);
 configuration.epsilon_range = linspace (0.1, 5, 20);
 
-outer_thresholds = 34;
-inner_thresholds = 23;
+outer_thresholds = 25;
+inner_thresholds = 15;
 max_inner_iterations = 10;
-seeds = 17;
+seeds = [2 10];
 
 analytical_weight = 1;
 experimental_weight = 5;
@@ -90,7 +90,6 @@ for (outer = outer_thresholds)
       for (ii = 1:numel (clean_experimental_data))
         idx = randperm (rows (clean_experimental_data{ii}));
         experimental_shuffled{ii} = clean_experimental_data{ii}(idx, :);
-        experimental_shuffled{ii}(:, end) = 1 ./ experimental_shuffled{ii}(:, end);
       endfor
 
       overall_counter = 0;

@@ -16,12 +16,12 @@ clear all
 close all hidden
 clc
 
-configurations = [6 8 10];
-base_path = "/Users/eugenio/Desktop/test_code/dataset";
+configurations = [20 30 40 48 60 72 80 90 100 108 120];
+base_path = "/Users/eugenio/Desktop/Q26-per-ml";
 
 %% Example to retrieve task_idx:
-%    head -n 2 10.csv| tail -n 1 | tr , '\n' | grep -n nTask | cut -d : -f 1 | xargs echo
-task_idx = [5 10 15 22];
+%    head -n 2 10.csv | tail -n 1 | tr , '\n' | grep -n nTask | cut -d : -f 1 | xargs echo
+task_idx = [6 14 22 30 38 46 54 62 70 78];
 
 operational_data = cell (size (configurations));
 for (idx = 1:numel (configurations))
