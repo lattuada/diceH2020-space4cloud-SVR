@@ -16,7 +16,7 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/Q26-per-ml";
+base_directory = "/Users/eugenio/Desktop/Q26-per-ml/no_max";
 
 configuration.runs = [20 30 40 48 60 72 80 90 100 108 120];
 configuration.missing_runs = [];
@@ -26,16 +26,9 @@ configuration.test_fraction = 0.2;
 
 configuration.options = "-s 3 -t 0 -q -h 0 ";
 configuration.C_range = linspace (1e-4, 1, 20);
-configuration.epsilon_range = linspace (1e-8, 1, 20);
+configuration.epsilon_range = linspace (1e-10, 1e-2, 20);
 
 %% End of configuration
-
-outfilename = [base_directory, "/model.txt"];
-[~, err, ~] = stat (outfilename);
-if (err == 0)
-  error (sprintf ("learn_spark_model: '%s' exists, it cannot be overwritten",
-                  outfilename));
-endif
 
 experimental_data = cell (size (configuration.runs));
 for (ii = 1:numel (configuration.runs))
@@ -80,9 +73,7 @@ epsilon = results.epsilon;
 train_error = results.train_error;
 test_error = results.test_error;
 cv_error = results.cv_error;
-available_error = results.available_error;
-missing_error = results.missing_error;
 
+outfilename = [base_directory, "/model.txt"];
 save (outfilename, "b", "w", "useful_columns", "working_mu", "working_sigma",
-      "C", "epsilon", "train_error", "test_error", "cv_error",
-      "available_error", "missing_error");
+      "C", "epsilon", "train_error", "test_error", "cv_error");
