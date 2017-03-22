@@ -17,11 +17,16 @@
 ##
 ## Compute the average response time @var{R} given the number of @var{cores},
 ## @var{tasks}, and the @var{demand} per task.
+## You should provide as input the raw data taken directly from CSV tables.
 ##
 ## @end deftypefn
 
 function R = compute_waves_prediction (cores, tasks, demand)
 
-R = mean (sum (ceil (bsxfun (@rdivide, tasks, cores)) .* demand));
+avg_cores = mean (cores);
+avg_tasks = mean (tasks);
+avg_demand = mean (demand);
+
+R = sum (ceil (avg_tasks ./ avg_cores) .* avg_demand);
 
 endfunction
