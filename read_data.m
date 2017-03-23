@@ -29,4 +29,9 @@ endif
 
 sample = csvread (filename, 2, 0);
 
+# For compatibility with Spark-Log-Parser's summary.csv files
+if (all (sample(:, 1) == 0))
+  sample = sample(:, 2:end);
+endif
+
 endfunction
