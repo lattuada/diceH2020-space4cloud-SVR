@@ -16,9 +16,9 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/Q26-per-ml/no_max";
+base_directory = "/Users/eugenio/Desktop/TPCDS500-D_processed_logs/ml/Q52/full";
 
-configuration.runs = [20 30 40 48 60 72 80 90 100 108 120];
+configuration.runs = [12 16 20 24 28 32 36 40 44 48 52];
 configuration.missing_runs = [];
 
 configuration.train_fraction = 0.6;
@@ -74,6 +74,17 @@ train_error = results.train_error;
 test_error = results.test_error;
 cv_error = results.cv_error;
 
+one_table = sprintf ("%s/%d.csv", base_directory, configuration.runs(1));
+fid = fopen (one_table, "r");
+% Twice to discard the first line with only the application name
+line = fgetl (fid);
+line = strtrim (fgetl (fid));
+fclose (fid);
+
+headers = strsplit (line, ",");
+% +1 to discard the applicationId, 2:end to avoid the predicted time
+useful_headers = { headers{useful_columns(2:end) + 1} }';
+
 outfilename = [base_directory, "/model.txt"];
-save (outfilename, "b", "w", "useful_columns", "working_mu", "working_sigma",
-      "C", "epsilon", "train_error", "test_error", "cv_error");
+save (outfilename, "b", "w", "useful_headers", "useful_columns", "working_mu",
+      "working_sigma", "C", "epsilon", "train_error", "test_error", "cv_error");
