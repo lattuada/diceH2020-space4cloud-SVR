@@ -76,15 +76,43 @@ cv_error = results.cv_error;
 
 one_table = sprintf ("%s/%d.csv", base_directory, configuration.runs(1));
 fid = fopen (one_table, "r");
-% Twice to discard the first line with only the application name
-line = fgetl (fid);
-line = strtrim (fgetl (fid));
+first_line = fgetl (fid);
+second_line = strtrim (fgetl (fid));
 fclose (fid);
 
-headers = strsplit (line, ",");
+query = strtrim (strrep (first_line, "Application class:", ""));
+headers = strsplit (second_line, ",");
 % +1 to discard the applicationId, 2:end to avoid the predicted time
 useful_headers = { headers{useful_columns(2:end) + 1} }';
 
 outfilename = [base_directory, "/model.txt"];
 save (outfilename, "b", "w", "useful_headers", "useful_columns", "working_mu",
       "working_sigma", "C", "epsilon", "train_error", "test_error", "cv_error");
+
+data.b = b;
+data.mu_t = working_mu(1);
+data.sigma_t = working_sigma(1);
+
+for (ii = 1:numel (w))
+  feature.w = w(ii);
+  feature.mu = working_mu(ii + 1);
+  feature.sigma = working_sigma(ii + 1);
+  name = useful_headers{ii};
+  if (strcmp (name, "nContainers"))
+    name = "x";
+  endif
+  if (strcmp (name, "users"))
+    name = "h";
+  endif
+  features.(name) = feature;
+endfor
+
+data.mlFeatures = features;
+full_data.(query) = data;
+
+pkg load io
+json_content = object2json (full_data);
+json_filename = [base_directory, "/model.json"];
+fid = fopen (json_filename, "w");
+fdisp (fid, json_content);
+fclose (fid);
