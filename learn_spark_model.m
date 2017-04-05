@@ -16,7 +16,7 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/TPCDS500-D_processed_logs/ml/Q52/full";
+base_directory = "/Users/eugenio/Desktop/TPCDS500-D_processed_logs/ml/Q52";
 
 configuration.runs = [12 16 20 24 28 32 36 40 44 48 52];
 configuration.missing_runs = [];
@@ -26,7 +26,7 @@ configuration.test_fraction = 0.2;
 
 configuration.options = "-s 3 -t 0 -q -h 0 ";
 configuration.C_range = linspace (1e-4, 1, 20);
-configuration.epsilon_range = linspace (1e-10, 1e-2, 20);
+configuration.epsilon_range = linspace (1e-4, 1, 20);
 
 %% End of configuration
 
@@ -106,6 +106,13 @@ for (ii = 1:numel (w))
   endif
   features.(name) = feature;
 endfor
+
+if (! isfield (features, "h"))
+  feature.w = 0;
+  feature.mu = 0;
+  feature.sigma = 1;
+  features.h = feature;
+endif
 
 data.mlFeatures = features;
 full_data.(query) = data;
