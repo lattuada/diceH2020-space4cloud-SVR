@@ -16,9 +16,11 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/TPCDS500-D_processed_logs/ml/Q52";
+base_directory = "/Users/eugenio/Desktop/Azure-merged-data-A-D/ml/Q26/clean";
 
-configuration.runs = [12 16 20 24 28 32 36 40 44 48 52];
+only_containers = true;
+
+configuration.runs = [6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 52];
 configuration.missing_runs = [];
 
 configuration.train_fraction = 0.6;
@@ -43,6 +45,10 @@ avg_times = cellfun (@(A) mean (A(:, 1)), clean_experimental_data);
 
 sample = vertcat (clean_experimental_data{:});
 sample(:, end) = 1 ./ sample(:, end);
+
+if (only_containers)
+  sample = [sample(:, 1), sample(:, end)];
+endif
 
 idx = randperm (rows (sample));
 shuffled = sample(idx, :);
