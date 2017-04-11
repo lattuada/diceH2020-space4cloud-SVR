@@ -16,9 +16,9 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/Azure-merged-data-A-D/ml/Q26/clean";
+base_directory = "/Users/eugenio/Desktop/Azure-merged-data-A-D/ml/Q26";
 
-only_containers = true;
+only_containers = false;
 
 configuration.runs = [6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 52];
 configuration.missing_runs = [];
@@ -46,10 +46,6 @@ avg_times = cellfun (@(A) mean (A(:, 1)), clean_experimental_data);
 sample = vertcat (clean_experimental_data{:});
 sample(:, end) = 1 ./ sample(:, end);
 
-if (only_containers)
-  sample = [sample(:, 1), sample(:, end)];
-endif
-
 idx = randperm (rows (sample));
 shuffled = sample(idx, :);
 
@@ -61,6 +57,13 @@ useful_columns = setdiff (cols, constant_columns);
 working_sample = shuffled(:, useful_columns);
 working_mu = mu(useful_columns);
 working_sigma = sigma(useful_columns);
+
+if (only_containers)
+  useful_columns = [useful_columns(1); useful_columns(end)];
+  working_sample = [working_sample(:, 1), working_sample(:, end)];
+  working_mu = [working_mu(1); working_mu(end)];
+  working_sigma = [working_sigma(1); working_sigma(end)];
+endif
 
 weights = ones (rows (working_sample), 1);
 
