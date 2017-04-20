@@ -14,16 +14,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-root="${1?error: missing root directory}"
-out="${2?error: missing output directory}"
-
-echo warning: this script is not robust to directory structure changes 1>&2
+root="${1?error: missing data directory}"
 
 find "$root" -name '*.csv' | while IFS= read -r filename; do
-    query="$(echo "$filename" | awk -F / '{ print $2 }')"
+    relname="${filename#$root/}"
+
+    query="$(echo "$relname" | cut -d / -f 1)"
     base="$(basename "$filename")"
 
-    dir="$out/$query"
+    dir="$query"
     mkdir -p "$dir"
     finalfile="$dir/$base"
     if ls "$dir" | grep -q "/$base"; then

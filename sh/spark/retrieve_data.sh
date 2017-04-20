@@ -14,19 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-root="${1?error: missing root directory}"
-out="${2?error: missing output directory}"
+root="${1?error: missing traces directory}"
 
-echo warning: this script is not robust to directory structure changes 1>&2
+find "$root" -name summary.csv -type f | while IFS= read -r filename; do
+    relname="${filename#$root/}"
 
-find "$root" -name summary.csv -type f | grep /traces/ \
-    | while IFS= read -r filename; do
+    cores="$(echo "$relname" | cut -d / -f 1 | awk -F _ '{ print $1 * $2 }')"
+    query="$(echo "$relname" | cut -d / -f 2)"
+    vm="$(echo "$relname" | cut -d / -f 3)"
 
-    cores="$(echo "$filename" | awk -F / '{ print $4 }' | awk -F _ '{ print $1 * $2 }')"
-    query="$(echo "$filename" | awk -F / '{ print $5 }')"
-    vm="$(echo "$filename" | awk -F / '{ print $6 }')"
-
-    destdir="$out/$query/$vm"
+    destdir="$query/$vm"
     mkdir -p "$destdir"
 
     destfile="$destdir/$cores.csv"
