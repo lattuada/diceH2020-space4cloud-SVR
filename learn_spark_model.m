@@ -16,11 +16,11 @@ clear all
 close all hidden
 clc
 
-base_directory = "/Users/eugenio/Desktop/Azure-merged-data-A-D/ml/Q26";
+base_directory = argv(){1};
 
 only_containers = false;
 
-configuration.runs = [6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 52];
+configuration.runs = str2num(argv(){2});
 configuration.missing_runs = [];
 
 configuration.train_fraction = 0.6;
@@ -45,6 +45,8 @@ avg_times = cellfun (@(A) mean (A(:, 1)), clean_experimental_data);
 
 sample = vertcat (clean_experimental_data{:});
 sample(:, end) = 1 ./ sample(:, end);
+
+rand("seed", 1);
 
 idx = randperm (rows (sample));
 shuffled = sample(idx, :);
